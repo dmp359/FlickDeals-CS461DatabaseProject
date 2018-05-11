@@ -1,7 +1,7 @@
 import psycopg2
 
 from DBUtils import DBUtils
-from Student import Student
+from Users import User
 
 # Read the java properties file.
 #
@@ -60,7 +60,7 @@ class Registrar:
         except psycopg2.Error as e:
             print (e)
 
-
+'''
    # Register a new student in the database.
    # @param newStudent
    # @return
@@ -82,6 +82,7 @@ class Registrar:
    # @param sid
    # @param gpa
    # @return
+    #
     def setGPA(self, sid, gpa):
         student = None;
         try:
@@ -117,3 +118,4 @@ class Registrar:
 
     def addTermsPreparedStatement(self, terms):
         raise Exception("Not Supported in psycopg2")
+'''
