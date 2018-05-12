@@ -50,21 +50,13 @@ search_component = widgets.HBox([search_bar, search_button])
 # Vertically arrange welcome banner, search component, and deal grid to create welcome page
 welcome_page = widgets.VBox([welcome_banner, search_component, deal_grid])
 
-# Example for now
-temp_search_result = widgets.HTML(
-    value='''
-        <div class="grid-container">
-            <div class="grid-item">Result 1</div>
-            <div class="grid-item">Result 2</div>
-        </div>
-    '''.format(gridItems=gridItems)
-)
+
 
 # Tab component
 pages = widgets.Tab()
 
  # Set what widget is shown on each page
-pages.children = [welcome_page, temp_search_result]
+pages.children = [welcome_page]
 
 # Set name of tabs
 tab_contents = ['Home', 'Search Result']
@@ -79,9 +71,17 @@ def displayWelcomePage():
 def run_deal_search_query(sender):
     reg = Registrar()
     response = reg.openDBConnectionWithBundle("PgBundle.properties")
-    print(response)
+
+    # Example result page based on search result
+    pages.children = [welcome_page, widgets.HTML(
+        value='''
+            <div class="grid-container">
+                <div class="grid-item">{response}</div>
+            </div>
+        '''.format(response=response),
+    )]
+    
     pages.selected_index = 1
 
-    
 # Query handlers
 search_button.on_click(run_deal_search_query)
