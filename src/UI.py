@@ -21,25 +21,31 @@ studentGPA = widgets.Textarea(
     disabled=False
 )
 '''
-welcomeBanner = widgets.HTML(
-    value='''
+
+# This list will be created programatically eventually
+# Filled in with title/description and clickable image from db
+deal_HTML_items = [
+    '<div class="grid-item">Deal description 1</div>',
+    '<div class="grid-item">Deal description 2</div>',
+    '<div class="grid-item">Deal description 3</div>',
+    '<div class="grid-item">Deal description 4</div>',
+    '<div class="grid-item">Deal description 5</div>',
+    '<div class="grid-item">Deal description 6</div>',
+]
+
+gridItems = ''.join(deal_HTML_items)
+welcomeHTML = '''
     <link rel="stylesheet" href="styles.css">
     Hi and welcome to <b>Flick Deals</b>
     <img src="http://images.clipartpanda.com/money-clipart-money-pics-free.png" height=50 width = 50>
     <h1> Check out today's hottest deals! </h1>
         <div class="grid-container">
-            <div class="grid-item">DEAL 1</div>
-            <div class="grid-item">DEAL 2</div>
-            <div class="grid-item">DEAL 3</div>
-            <div class="grid-item">DEAL 4</div>
-            <div class="grid-item">DEAL 5</div>
-            <div class="grid-item">DEAL 6</div>
-            <div class="grid-item">DEAL 7</div>
-            <div class="grid-item">DEAL 8</div>
-            <div class="grid-item">DEAL 9</div>
+            {gridItems}
         </div>
-     
-     ''',
+     '''.format(gridItems=gridItems)
+
+welcomeBanner = widgets.HTML(
+    value=welcomeHTML,
 )
 
 def printHello():
