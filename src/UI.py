@@ -6,6 +6,7 @@ from Users import User
 from QueryManager import QueryManager
 from Deals import Deal
 
+
 #Define Widgets----
 
 # Search bar text
@@ -18,6 +19,9 @@ search_bar = widgets.Text(
 
 # Search bar button
 search_button = widgets.Button(description="Search")
+
+# Search bar and button horizontally next to each other
+search_component = widgets.HBox([search_bar, search_button])
 
 # Welcome banner and picture
 welcome_banner = widgets.HTML(
@@ -37,16 +41,35 @@ business_banner = widgets.HTML(
         <img src="https://openclipart.org/download/279010/Simple-Isometric-Store.svg" height=50 width = 50>
     ''',
 )
+# TODO: Query database for deal details
 
-# This will maybe be created programatically eventually
 # Filled in with title/description and image from db
 deal_title = [widgets.Label('Deal Title ' + str(i)) for i in range(6)]
+deal_descriptions = [widgets.Label('This is a great deal. $50 off ' + str((i+1) * 100)) for i in range(6)]
+rating_slider = widgets.IntSlider(
+    value=5,
+    min=1,
+    max=5,
+    step=1,
+    description='Rate:',
+    disabled=False,
+    continuous_update=False,
+    orientation='horizontal',
+    readout=True,
+    readout_format='d'
+)
+rating_sliders = [rating_slider for i in range(6)]
+rating_buttons = [widgets.Button(description='Submit Rating') for i in range(6)]
 
-# TODO: Query database
-deal_descrptions = [widgets.Label('This is a great deal. $50 off ' + str((i+1) * 100)) for i in range(6)]
+# Create a dictionary of each button to associated index of deal to rate.
+# Used by rate deals callback
+rating_button_dict = {}
+for i in range(len(rating_buttons)):
+    rating_button_dict[rating_buttons[i]] = i
+deal_detail_cols = [widgets.VBox([deal_descriptions[i], rating_sliders[i], rating_buttons[i]]) for i in range(6)]
 
-# "See details" accordions. Children are descriptions of each deal and should be created all at once at start (not on click)
-see_details_accordions = [widgets.Accordion(children=[deal_descrptions[i]]) for i in range(6)]
+# "See details" accordions. Children are descriptions of each deal
+see_details_accordions = [widgets.Accordion(children=[deal_detail_cols[i]]) for i in range(6)]
 for i in range(len(see_details_accordions)):
     see_details_accordions[i].selected_index = None # Collapse accordions
     see_details_accordions[i].set_title(0, 'See details')
@@ -60,9 +83,6 @@ col1 = widgets.VBox([deal_title[0], see_details_accordions[0], deal_title[1], se
 col2 = widgets.VBox([deal_title[2], see_details_accordions[2], deal_title[3], see_details_accordions[3]])
 col3 = widgets.VBox([deal_title[4], see_details_accordions[4], deal_title[5], see_details_accordions[5]])
 deals_boxed = widgets.HBox([col1, col2, col3])
-
-# Search bar and button horizontally next to each other
-search_component = widgets.HBox([search_bar, search_button])
 
 # Vertically arrange welcome banner, search component, and deal grid to create welcome page
 welcome_page = widgets.VBox([welcome_banner, search_component, deals_boxed])
@@ -91,12 +111,15 @@ def run_deal_search_query(sender):
     # TODO: Select deal where deal name = search bar value
     #deal_searched = Deal(name=search_bar.value)
     deals = man.searchForDeal()
+    first_names = [i[0] for i in deals]
+    last_names = [i[1] for i in deals]
+
     result_page = widgets.HTML(
         value='''
             <div class="grid-container">
-                <div class="grid-item">{deals}</div>
+                <div class="grid-item">{first_names}</div>
             </div>
-        '''.format(deals=deals),
+        '''.format(first_names=first_names),
     )
 
     # Last tab should be search results and replaced if it already is
@@ -111,5 +134,15 @@ def run_deal_search_query(sender):
     # Switch to search result page
     pages.selected_index = 2
 
+def run_rate_query(sender):
+    deal_index = rating_button_dict[sender] # lookup in dict for which button was clicked
+    print('You chose to rate deal number ' + str(deal_index) + ' with a value of ' + str(rating_sliders[deal_index].value))
+    man = QueryManager()
+    res = man.openDBConnectionWithBundle("PgBundle.properties")
+    print(res)
+
 # Query handlers
 search_button.on_click(run_deal_search_query)
+
+for i in range(6):
+    rating_buttons[i].on_click(run_rate_query)
