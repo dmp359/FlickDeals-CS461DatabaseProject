@@ -11,7 +11,7 @@ from Registrar import Registrar
 search_bar = widgets.Text(
     placeholder='Search',
     description='Find Deal:',
-    disabled=False,display='flex'
+    disabled=False,
 )
 
 # Search bar button

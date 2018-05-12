@@ -1,3 +1,5 @@
 PgBundle.properties
-__pycache__
+__pycache__/
+*.py[cod]
+*.ipynb
 .vscode
