@@ -5,22 +5,16 @@ from IPython.display import display
 from Users import User
 from Registrar import Registrar
 
+
 #Define Widgets.
-'''
-studentName = widgets.Textarea(
-    value='',
-    placeholder='Enter Student Name',
-    description='Name:',
-    disabled=False
+search_bar = widgets.Text(
+    placeholder='Search',
+    description='Find Deal:',
+    disabled=False,display='flex'
 )
 
-studentGPA = widgets.Textarea(
-    value='',
-    placeholder='Enter Student GPA',
-    description='GPA:',
-    disabled=False
+search_button = widgets.Button(description="Search",display='flex'
 )
-'''
 
 # This list will be created programatically eventually
 # Filled in with title/description and clickable image from db
@@ -33,53 +27,61 @@ deal_HTML_items = [
     '<div class="grid-item">Deal description 6</div>',
 ]
 
+welcome_banner = widgets.HTML(
+    value='''
+        <link rel="stylesheet" href="styles.css">
+        Hi and welcome to <b>Flick Deals</b>
+        <img src="http://images.clipartpanda.com/money-clipart-money-pics-free.png" height=50 width = 50>
+        <h1> Check out today's hottest deals! </h1>
+    ''',
+)
+
 gridItems = ''.join(deal_HTML_items)
-welcomeHTML = '''
-    <link rel="stylesheet" href="styles.css">
-    Hi and welcome to <b>Flick Deals</b>
-    <img src="http://images.clipartpanda.com/money-clipart-money-pics-free.png" height=50 width = 50>
-    <h1> Check out today's hottest deals! </h1>
+deal_grid = widgets.HTML(
+    value='''
         <div class="grid-container">
             {gridItems}
         </div>
-     '''.format(gridItems=gridItems)
+    '''.format(gridItems=gridItems)
+)
+# Search bar and button horizontally next to each other
+search_component = widgets.HBox([search_bar, search_button])
 
-welcomeBanner = widgets.HTML(
-    value=welcomeHTML,
+# Vertically arrange welcome banner, search component, and deal grid to create welcome page
+welcome_page = widgets.VBox([welcome_banner, search_component, deal_grid])
+
+# Example for now
+temp_search_result = widgets.HTML(
+    value='''
+        <div class="grid-container">
+            <div class="grid-item">Result 1</div>
+            <div class="grid-item">Result 2</div>
+        </div>
+    '''.format(gridItems=gridItems)
 )
 
-def printHello():
-    display(welcomeBanner)
-   
+# Tab component
+pages = widgets.Tab()
 
-#Click Function
-def run_queries(sender):
+ # Set what widget is shown on each page
+pages.children = [welcome_page, temp_search_result]
+
+# Set name of tabs
+tab_contents = ['Home', 'Search Result']
+for i in range(len(tab_contents)):
+    pages.set_title(i, str(tab_contents[i])) 
+
+# Display tab component which holds all widgets
+def displayWelcomePage():
+    display(pages)
+
+# Click Function
+def run_deal_search_query(sender):
     reg = Registrar()
     response = reg.openDBConnectionWithBundle("PgBundle.properties")
-    print (response)
+    print(response)
+    pages.selected_index = 1
+
     
-    '''
-    newStudent = Student(studentName.value)
-    newStudent = reg.registerStudent(newStudent);
-    print("Registered a new student: " + str(newStudent));
-
-    newStudent = reg.setGPA(newStudent.getId(), float(studentGPA.value));
-    print("Updated GPA for student: " + str(newStudent));
-
-    roster = reg.getRoster();
-    reg.closeConnection();
-    table=Student.showAsTable(roster)
-    display(table)
-
-def add_one_student():
-    button = widgets.Button(description="Run")
-    
-    #Display Widgets
-    display(studentName)
-    display(studentGPA)
-    display(button)
-
-    #Click Handlers
-    button.on_click(run_queries)
-'''
-
+# Query handlers
+search_button.on_click(run_deal_search_query)
