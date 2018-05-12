@@ -1,4 +1,4 @@
-piimport pandas as pd #show data as tables
+import pandas as pd #show data as tables
 
 # An implementation of the Deals class.
 class Deal:

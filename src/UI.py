@@ -3,12 +3,14 @@ from ipywidgets import *
 from IPython.display import display
 
 from Users import User
-from Registrar import Registrar
+from QueryManager import QueryManager
+from Deals import Deal
 
 #Define Widgets.
 
 # Search bar text
 search_bar = widgets.Text(
+    value='',
     placeholder='Search',
     description='Find Deal:',
     disabled=False,
@@ -73,11 +75,14 @@ def displayWelcomePage():
 
 # Click Function
 def run_deal_search_query(sender):
-    reg = Registrar()
-    response = reg.openDBConnectionWithBundle("PgBundle.properties")
+    man = QueryManager()
+    response = man.openDBConnectionWithBundle("PgBundle.properties")
 
     # Example result page based on search result
-    # TODO: Query database
+    # TODO: Select deal where deal name = search bar value
+    #deal_searched = Deal(name=search_bar.value)
+    deals = man.searchForDeal()
+    response = deals
     pages.children = [welcome_page, widgets.HTML(
         value='''
             <div class="grid-container">

@@ -4,7 +4,7 @@ import pandas as pd #show data as tables
 class User:
 
     # Constructor
-    def __init__(self, cid, age, fname, lname, gender, aid, pnum, email, password):
+    def __init__(self, cid=None, age=None, fname=None, lname=None, gender=None, aid=None, pnum=None, email=None, password=None):
         self._cid = cid
         self._age = age
         self._fname = fname
