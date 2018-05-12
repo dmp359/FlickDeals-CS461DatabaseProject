@@ -6,7 +6,7 @@ from Users import User
 from QueryManager import QueryManager
 from Deals import Deal
 
-#Define Widgets.
+#Define Widgets----
 
 # Search bar text
 search_bar = widgets.Text(
@@ -33,7 +33,7 @@ welcome_banner = widgets.HTML(
 business_banner = widgets.HTML(
     value='''
         <link rel="stylesheet" href="styles.css">
-        Check out top retailers! 
+        Check out <b>top retailers</b>! 
         <img src="https://openclipart.org/download/279010/Simple-Isometric-Store.svg" height=50 width = 50>
     ''',
 )
