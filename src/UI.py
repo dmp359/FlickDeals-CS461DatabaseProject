@@ -22,7 +22,24 @@ studentGPA = widgets.Textarea(
 )
 '''
 welcomeBanner = widgets.HTML(
-    value='Hello and welcome to <b>Flick Deals</b><br><img src="http://images.clipartpanda.com/money-clipart-money-pics-free.png" height=50 width = 50>',
+    value='''
+    <link rel="stylesheet" href="styles.css">
+    Hi and welcome to <b>Flick Deals</b>
+    <img src="http://images.clipartpanda.com/money-clipart-money-pics-free.png" height=50 width = 50>
+    <h1> Check out today's hottest deals! </h1>
+        <div class="grid-container">
+            <div class="grid-item">DEAL 1</div>
+            <div class="grid-item">DEAL 2</div>
+            <div class="grid-item">DEAL 3</div>
+            <div class="grid-item">DEAL 4</div>
+            <div class="grid-item">DEAL 5</div>
+            <div class="grid-item">DEAL 6</div>
+            <div class="grid-item">DEAL 7</div>
+            <div class="grid-item">DEAL 8</div>
+            <div class="grid-item">DEAL 9</div>
+        </div>
+     
+     ''',
 )
 
 def printHello():
