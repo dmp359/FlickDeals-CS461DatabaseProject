@@ -29,6 +29,15 @@ welcome_banner = widgets.HTML(
     ''',
 )
 
+# Business banner and picture
+business_banner = widgets.HTML(
+    value='''
+        <link rel="stylesheet" href="styles.css">
+        Check out top retailers! 
+        <img src="https://openclipart.org/download/279010/Simple-Isometric-Store.svg" height=50 width = 50>
+    ''',
+)
+
 # This will maybe be created programatically eventually
 # Filled in with title/description and image from db
 deal_title = [widgets.Label('Deal Title ' + str(i)) for i in range(6)]
@@ -61,11 +70,11 @@ welcome_page = widgets.VBox([welcome_banner, search_component, deals_boxed])
 # Tab component
 pages = widgets.Tab()
 
-# Set what widget is shown on each page. To start, only show welcome page.
-pages.children = [welcome_page]
+# Set what widget is shown on each page on launch
+pages.children = [welcome_page, business_banner]
 
 # Set name of tabs
-tab_contents = ['Home', 'Search Result']
+tab_contents = ['Home', 'Businesses', 'Search Results']
 for i in range(len(tab_contents)):
     pages.set_title(i, str(tab_contents[i])) 
 
@@ -76,23 +85,31 @@ def displayWelcomePage():
 # Click Function
 def run_deal_search_query(sender):
     man = QueryManager()
-    response = man.openDBConnectionWithBundle("PgBundle.properties")
+    res = man.openDBConnectionWithBundle("PgBundle.properties")
 
     # Example result page based on search result
     # TODO: Select deal where deal name = search bar value
     #deal_searched = Deal(name=search_bar.value)
     deals = man.searchForDeal()
-    response = deals
-    pages.children = [welcome_page, widgets.HTML(
+    result_page = widgets.HTML(
         value='''
             <div class="grid-container">
-                <div class="grid-item">{response}</div>
+                <div class="grid-item">{deals}</div>
             </div>
-        '''.format(response=response),
-    )]
+        '''.format(deals=deals),
+    )
+
+    # Last tab should be search results and replaced if it already is
+    l = list(pages.children)
+    if len(pages.children) < 3:
+        l.append(result_page)
+    else:
+        l[len(pages.children) - 1] = result_page
     
+    pages.children = tuple(l)
+
     # Switch to search result page
-    pages.selected_index = 1
+    pages.selected_index = 2
 
 # Query handlers
 search_button.on_click(run_deal_search_query)
