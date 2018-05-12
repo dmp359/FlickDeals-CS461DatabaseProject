@@ -27,31 +27,23 @@ welcome_banner = widgets.HTML(
     ''',
 )
 
-
-# This list will be created programatically eventually
+# This will maybe be created programatically eventually
 # Filled in with title/description and clickable image from db
-deal_HTML_items = [
-    '<div class="grid-item">Deal description 1</div>',
-    '<div class="grid-item">Deal description 2</div>',
-    '<div class="grid-item">Deal description 3</div>',
-    '<div class="grid-item">Deal description 4</div>',
-    '<div class="grid-item">Deal description 5</div>',
-    '<div class="grid-item">Deal description 6</div>',
-]
-gridItems = ''.join(deal_HTML_items) # Convet deal_HTML_items to a string
-deal_grid = widgets.HTML(
-    value='''
-        <div class="grid-container">
-            {gridItems}
-        </div>
-    '''.format(gridItems=gridItems)
-)
+deal_texts = [widgets.Label('Deal' + str(i)) for i in range(6)]
+deal_go_buttons = [widgets.Button(description='Go') for i in range(6)]
+
+
+col1 = widgets.VBox([deal_texts[0], deal_go_buttons[0], deal_texts[1], deal_go_buttons[1]])
+col2 = widgets.VBox([deal_texts[2], deal_go_buttons[2], deal_texts[3], deal_go_buttons[3]])
+col3 = widgets.VBox([deal_texts[4], deal_go_buttons[4], deal_texts[5], deal_go_buttons[5]])
+
+deals_boxed = widgets.HBox([col1, col2, col3])
 
 # Search bar and button horizontally next to each other
 search_component = widgets.HBox([search_bar, search_button])
 
 # Vertically arrange welcome banner, search component, and deal grid to create welcome page
-welcome_page = widgets.VBox([welcome_banner, search_component, deal_grid])
+welcome_page = widgets.VBox([welcome_banner, search_component, deals_boxed])
 
 # Tab component
 pages = widgets.Tab()
@@ -60,7 +52,7 @@ pages = widgets.Tab()
 pages.children = [welcome_page]
 
 # Set name of tabs
-tab_contents = ['Home', 'Search Result']
+tab_contents = ['Home', 'Search Result', 'Deal Details']
 for i in range(len(tab_contents)):
     pages.set_title(i, str(tab_contents[i])) 
 
@@ -87,3 +79,6 @@ def run_deal_search_query(sender):
 
 # Query handlers
 search_button.on_click(run_deal_search_query)
+
+for go_button in deal_go_buttons:
+    go_button.on_click(run_deal_search_query)
