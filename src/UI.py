@@ -98,15 +98,21 @@ rating_slider = widgets.IntSlider(
     readout=True,
     readout_format='d'
 )
+# Rating/favorites
 rating_sliders = [rating_slider for i in range(6)]
-rating_buttons = [widgets.Button(description='Submit Rating') for i in range(6)]
+deal_button_controls = [widgets.HBox(
+    [widgets.Button(description='Submit Rating'),
+     widgets.Button(description='Favorite Deal')]) for i in range(6)]
 
 # Create a dictionary of each button to associated index of deal to rate.
-# Used by rate deals callback
+# Used by rate/favorite deals callback
 rating_button_dict = {}
-for i in range(len(rating_buttons)):
-    rating_button_dict[rating_buttons[i]] = i
-deal_detail_cols = [widgets.VBox([deal_descriptions[i], rating_sliders[i], rating_buttons[i]]) for i in range(6)]
+favorite_button_dict = {}
+for i in range(len(deal_button_controls)):
+    rating_button_dict[deal_button_controls[i].children[0]] = i
+    favorite_button_dict[deal_button_controls[i].children[1]] = i
+
+deal_detail_cols = [widgets.VBox([deal_descriptions[i], rating_sliders[i], deal_button_controls[i]]) for i in range(6)]
 
 # "See details" accordions. Children are descriptions of each deal
 see_details_accordions = [widgets.Accordion(children=[deal_detail_cols[i]]) for i in range(6)]
@@ -242,9 +248,16 @@ def run_rate_query(sender):
     print(res)
     # TODO: Update tables appropriately to rate
 
+def run_favorite_query(sender):
+    deal_index = favorite_button_dict[sender] # lookup in dict for which button was clicked
+    print('You chose to favorite deal number ' + str(deal_index))
+    man = QueryManager()
+    res = man.openDBConnectionWithBundle("PgBundle.properties")
+    print(res)
 
 ''' Button handlers ----------------------------------------------'''
 search_button.on_click(run_deal_search_query)
 see_all_button.on_click(run_deal_all_query)
-for i in range(6):
-    rating_buttons[i].on_click(run_rate_query)
+for i in range(len(deal_button_controls)):
+    deal_button_controls[i].children[0].on_click(run_rate_query)
+    deal_button_controls[i].children[1].on_click(run_favorite_query)
