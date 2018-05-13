@@ -2,10 +2,11 @@ import pandas as pd
 
 class Business:
     # Constructor
-    def __init__(self, bid, img_url, homepage,
+    def __init__(self, bid, name, img_url, homepage,
                  pnum, rid, num_visits,
                  num_favorited_deals):
         self._bid = bid
+        self._name = name
         self._img_url = img_url
         self._homepage = homepage
         self._pnum = pnum
@@ -19,6 +20,9 @@ class Business:
     
     def getImageUrl(self):
         return self._img_url
+
+    def getName(self):
+        return self._name
     
     def getHomepageUrl(self):
         return self._homepage

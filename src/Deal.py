@@ -6,7 +6,7 @@ class Deal:
     # Constructor
     def __init__(self, did, date_submitted, title,
                  desc, avg_rating, img, start_date,
-                 end_date, dur_id,bid):
+                 end_date,bid):
         self._did = did
         self._date_submitted = date_submitted
         self._title = title
@@ -15,7 +15,6 @@ class Deal:
         self._img = img
         self._start_date = start_date
         self._end_date = end_date
-        self._dur_id = dur_id
         self._bid = bid
 
     #  @return did

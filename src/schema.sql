@@ -15,7 +15,6 @@ create table Users (
 	email varchar(128) not null,
 	password varchar(128) not null
 );
-
 insert into Users values (6135, 18, 'John', 'Finkle', 'M', 6184, 1873498920, 'john.finkle@gmail.com', 'password123');
 insert into Users values (3155, 25, 'Phil', 'Wrinkle', 'M', 1743, 5935290053, 'philextreme@comcast.net', '1F93jhfcS');
 insert into Users values (2115, 38, 'Sarah', 'Lint', 'F', 9148, 5259482958, 'sarahsmiles@hotmail.com', 'cat43run92');
@@ -28,8 +27,7 @@ create table Category (
   categoryId varchar(128) primary key,
   categoryName varchar(128) not null
 );
-
-
+insert into Category values ('C1', 'Food');
 
 create table Deals (
   dealId varchar(128) primary key,
@@ -41,6 +39,30 @@ create table Deals (
   startDate Date not null,
   endDate Date not null
 );
+insert into Deals values ('TempDealId1', '01-19-18', 'Pizza Hut Deals', '$10 off your first order at PizzaHut.com!', 4.5, 
+                   'https://www.bleepstatic.com/content/posts/2017/10/15/PizzaHut.jpg',
+                   '01-20-18', '01-25-18');
+
+create table Ratings(
+  cid integer,
+  did varchar(128),
+  value integer,
+  primary key (cid, did),
+  foreign key (cid) references Users(customerId),
+  foreign key (did) references Deals(dealId)
+);
+insert into Ratings values (6135, 'TempDealId1', 4);
+insert into Ratings values (3155, 'TempDealId1', 1);
+
+create table Favorites(
+  cid integer,
+  did varchar(128),
+  primary key (cid, did),
+  foreign key (cid) references Users(customerId),
+  foreign key (did) references Deals(dealId)
+);
+insert into Ratings values (6135, 'TempDealId1');
+insert into Favorites values (3155, 'TempDealId1');
 
 create table Business (
   businessId varchar(128) primary key,
@@ -59,17 +81,10 @@ create table Belongs_To (
   foreign key (bid) references Business(businessId),
   foreign key (cid) references Category(categoryId)
 );
-insert into Deals values ('TempDealId1', '01-19-18', 'Pizza Hut Deals', '$10 off your first order at PizzaHut.com!', 4.5, 
-                   'https://www.bleepstatic.com/content/posts/2017/10/15/PizzaHut.jpg',
-                   '01-20-18', '01-25-18');
-
-insert into Category values ('C1', 'Food');
 
 insert into Business values ('1', 'BNAME', 'http://www1.cv-ag.com/wp-content/uploads/2016/01/business-people-working-together-istock_000017346252medium.jpg', 'https://business.com', 7033333333, 'TempDealId1');
 insert into Business values ('2', 'Apple', 'https://www.apple.com/ac/structured-data/images/knowledge_graph_logo.png?201606271147', 'https://www.apple.com/mac/home/images/social/macbook_mac_og.png?201804191038', 7022222222, 'TempDealId1');
 insert into Business values ('3', 'Nike', 'https://cdn.thesolesupplier.co.uk/2017/08/NIKE-Logo.jpg', 'https://c.static-nike.com/a/images/t_PDP_1280_v1/f_auto/lmpq4yxn0aqre66opd5d/air-presto-womens-shoe-89Tqz1nG.jpg', 70111111111, 'TempDealId1');
 insert into Business values ('4', 'Ikea', 'http://cache.magicmaman.com/data/photo/w515_c18/4m/ikea.jpg', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSH56xX80atcDnT7lZ757lDFCpzvMhtmzs_GvYgG-PJkgxzkYWv', 70000000000, 'TempDealId1');
-
-
 insert into Belongs_To values ('1', 'C1');
 
