@@ -1,8 +1,10 @@
-drop table Users;
-drop table Category;
 drop table Belongs_To;
 drop table Business;
+drop table Ratings;
+drop table Favorites;
 drop table Deals;
+drop table Users;
+drop table Category;
 
 create table Users (
   customerId integer primary key,
@@ -27,7 +29,7 @@ create table Category (
   categoryId varchar(128) primary key,
   categoryName varchar(128) not null
 );
-insert into Category values ('C1', 'Food');
+insert into Category values ('Cat1', 'Food');
 
 create table Deals (
   dealId varchar(128) primary key,
@@ -61,7 +63,7 @@ create table Favorites(
   foreign key (cid) references Users(customerId),
   foreign key (did) references Deals(dealId)
 );
-insert into Ratings values (6135, 'TempDealId1');
+insert into Favorites values (6135, 'TempDealId1');
 insert into Favorites values (3155, 'TempDealId1');
 
 create table Business (
@@ -86,5 +88,5 @@ insert into Business values ('1', 'BNAME', 'http://www1.cv-ag.com/wp-content/upl
 insert into Business values ('2', 'Apple', 'https://www.apple.com/ac/structured-data/images/knowledge_graph_logo.png?201606271147', 'https://www.apple.com/mac/home/images/social/macbook_mac_og.png?201804191038', 7022222222, 'TempDealId1');
 insert into Business values ('3', 'Nike', 'https://cdn.thesolesupplier.co.uk/2017/08/NIKE-Logo.jpg', 'https://c.static-nike.com/a/images/t_PDP_1280_v1/f_auto/lmpq4yxn0aqre66opd5d/air-presto-womens-shoe-89Tqz1nG.jpg', 70111111111, 'TempDealId1');
 insert into Business values ('4', 'Ikea', 'http://cache.magicmaman.com/data/photo/w515_c18/4m/ikea.jpg', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSH56xX80atcDnT7lZ757lDFCpzvMhtmzs_GvYgG-PJkgxzkYWv', 70000000000, 'TempDealId1');
-insert into Belongs_To values ('1', 'C1');
+insert into Belongs_To values ('1', 'Cat1');
 
