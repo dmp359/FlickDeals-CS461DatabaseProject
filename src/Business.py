@@ -2,9 +2,9 @@ import pandas as pd
 
 class Business:
     # Constructor
-    def __init__(self, bid, name, img_url, homepage,
-                 pnum, rid, num_visits,
-                 num_favorited_deals):
+    def __init__(self, bid=None, name=None, img_url=None, homepage=None,
+                 pnum=None, rid=None, num_visits=None,
+                 num_favorited_deals=None):
         self._bid = bid
         self._name = name
         self._img_url = img_url
@@ -39,11 +39,11 @@ class Business:
     def getNumFavorites(self):
         return self._num_favorited_deals
 
-    def incrementNumVisit(self):
-        _num_visits += 1
+    def setNumVisits(self, visit):
+        _num_visits = visit
 
-    def incrementNumFav(self):
-        _num_favorited_deals += 1
+    def setNumFavorites(self, fav):
+        _num_favorited_deals = fav
 
     # @return string representation
     def __str__(self):

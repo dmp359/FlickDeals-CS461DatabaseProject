@@ -59,13 +59,15 @@ class QueryManager:
 
 
     def searchForDeal(self, deal_name):
-        query = "select firstName, lastName from Users"
+        # Stackoverflow says this might work to find substrings inside. So 'Pizza' search could match
+        # 'Best Ever Pizza Hut Deal'
+        # TODO: Maybe also UNION with 'FROM Deals where description matches deal name
+        query = ''' SELECT title, description, avgRating, imageURL, startDate, endDate
+                    FROM Deals where title
+                    LIKE \'% {deal_name} %\''''.format(deal_name=deal_name)
+        print(query)
         return DBUtils.getAllRows(self._conn, query)
 
-
-   # Register a new student in the database.
-   # @param newStudent
-   # @return
 '''
     def registerStudent(self, newStudent):
         try :
@@ -89,6 +91,7 @@ class QueryManager:
     def setGPA(self, sid, gpa):
         student = None;
         try:
+            # Check if they exist
             cnt = DBUtils.getVar(self._conn, "select count(*) from Students where sid = " + str(sid))
             if (cnt == 0):
                 return student

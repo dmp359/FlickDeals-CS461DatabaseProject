@@ -43,7 +43,7 @@ business_banner = widgets.HTML(
     ''',
 )
 # TODO: Query database for deal details
-
+d = Deal()
 # Filled in with title/description and image from db
 deal_title = [widgets.Label('Deal Title ' + str(i)) for i in range(6)]
 deal_descriptions = [widgets.Label('This is a great deal. $50 off ' + str((i+1) * 100)) for i in range(6)]
@@ -111,7 +111,7 @@ def run_deal_search_query(sender):
     # Example result page based on search result
     # TODO: Select deal where deal name = search bar value
     #deal_searched = Deal(name=search_bar.value)
-    deals = man.searchForDeal()
+    deals = man.searchForDeal(search_bar.value)
     first_names = [i[0] for i in deals]
     last_names = [i[1] for i in deals]
 
