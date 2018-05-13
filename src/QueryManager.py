@@ -58,7 +58,7 @@ class QueryManager:
             print (e)
 
 
-    def searchForDeal(self):
+    def searchForDeal(self, deal_name):
         query = "select firstName, lastName from Users"
         return DBUtils.getAllRows(self._conn, query)
 

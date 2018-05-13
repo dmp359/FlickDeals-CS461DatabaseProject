@@ -4,9 +4,9 @@ import pandas as pd #show data as tables
 class Deal:
 
     # Constructor
-    def __init__(self, did, date_submitted, title,
-                 desc, avg_rating, img, start_date,
-                 end_date,bid):
+    def __init__(self, did=None, date_submitted=None, title=None,
+                 desc=None, avg_rating=None, img=None, start_date=None,
+                 end_date=None,bid=None):
         self._did = did
         self._date_submitted = date_submitted
         self._title = title
