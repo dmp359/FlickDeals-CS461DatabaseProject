@@ -2,9 +2,10 @@
 from ipywidgets import *
 from IPython.display import display
 
-from Users import User
+from User import User
 from QueryManager import QueryManager
-from Deals import Deal
+from Deal import Deal
+from Business import Business
 
 
 #Define Widgets----

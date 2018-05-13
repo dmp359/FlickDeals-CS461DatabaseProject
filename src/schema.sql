@@ -1,7 +1,7 @@
 drop table Users;
 
 create table Users (
-  customerId integer primary key,
+  	customerId integer primary key,
 	age integer,
 	firstName varchar(128),
 	lastName varchar(128),
