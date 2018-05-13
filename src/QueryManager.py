@@ -57,11 +57,23 @@ class QueryManager:
         except psycopg2.Error as e:
             print (e)
 
+    # Deals -----------------------------------------------------------------------------------
+    def getAllDeals(self):
+        # TODO: Get business name
+        query = 'SELECT title, description, avgRating, imageURL, startDate, endDate FROM Deals'
+        return DBUtils.getAllRows(self._conn, query)
 
     def searchForDeal(self, deal_name):
         # TODO: Maybe also UNION with 'FROM Deals where description matches deal name
+        # TODO: Get business name
         query = '''SELECT title, description, avgRating, imageURL, startDate, endDate
                    FROM Deals where title LIKE \'%{deal_name}%\''''.format(deal_name=deal_name)
+        return DBUtils.getAllRows(self._conn, query)
+
+    # Businesses -----------------------------------------------------------------------------------
+    def getAllRetailers(self):
+        # TODO: Sort by "reputation"
+        query = 'SELECT name, imageURL, homepageURL FROM Business'
         return DBUtils.getAllRows(self._conn, query)
 
 '''

@@ -7,6 +7,42 @@ from QueryManager import QueryManager
 from Deal import Deal
 from Business import Business
 
+# Quieries required on load of app
+
+# Given a list of business tuples, convert the data into html results grid
+# @param businesses - a deals tuple response from a query
+def getBusinessResultFromTuple(businesses):
+    names = [i[0] for i in businesses]
+    imageURLs = [i[1] for i in businesses]
+    homepageURLs = [i[2] for i in businesses]
+
+    result_page_html = ''
+    for i in range(len(names)):
+        result_page_html += '''
+            <div class="grid-container">
+                <div class="grid-item"> <a href="{homepageURL}" target="_blank">{name}</a></div>
+                <div class="grid-item">
+                    <img src="{imageURLs}" height=50 width=50>
+                </div>
+            </div>
+        '''.format(homepageURL=homepageURLs[i],
+                name=names[i],
+                imageURLs=imageURLs[i],
+                )
+    return result_page_html
+
+def run_business_all_query():
+    man = QueryManager()
+    res = man.openDBConnectionWithBundle("PgBundle.properties")
+
+    # Businesses is a list of tuples in the form of
+    # (name, imageURL, homepageURL)
+    businesses = man.getAllRetailers()
+    if (len(businesses) < 1):
+        return '<div class="grid-item"> Error connecting to database. Try again soon.></div>'
+    result_page_html = getBusinessResultFromTuple(businesses)
+    return result_page_html
+
 
 #Define Widgets----
 
@@ -20,9 +56,10 @@ search_bar = widgets.Text(
 
 # Search bar button
 search_button = widgets.Button(description="Search")
+see_all_button = widgets.Button(description="Browse All")
 
-# Search bar and button horizontally next to each other
-search_component = widgets.HBox([search_bar, search_button])
+# Search bar and buttons horizontally next to each other
+search_component = widgets.HBox([search_bar, search_button, see_all_button])
 
 # Welcome banner and picture
 welcome_banner = widgets.HTML(
@@ -42,8 +79,10 @@ business_banner = widgets.HTML(
         <img src="https://openclipart.org/download/279010/Simple-Isometric-Store.svg" height=50 width = 50>
     ''',
 )
-# TODO: Query database for deal details
-d = Deal()
+
+business_html = widgets.HTML(value = run_business_all_query())
+business_view = widgets.VBox([business_banner, business_html])
+
 # Filled in with title/description and image from db
 deal_title = [widgets.Label('Deal Title ' + str(i)) for i in range(6)]
 deal_descriptions = [widgets.Label('This is a great deal. $50 off ' + str((i+1) * 100)) for i in range(6)]
@@ -92,7 +131,7 @@ welcome_page = widgets.VBox([welcome_banner, search_component, deals_boxed])
 pages = widgets.Tab()
 
 # Set what widget is shown on each page on launch
-pages.children = [welcome_page, business_banner]
+pages.children = [welcome_page, business_view]
 
 # Set name of tabs
 tab_contents = ['Home', 'Businesses', 'Search Results']
@@ -100,55 +139,87 @@ for i in range(len(tab_contents)):
     pages.set_title(i, str(tab_contents[i])) 
 
 # Display tab component which holds all widgets
-def displayWelcomePage():
+# Main
+def launch():
     display(pages)
 
-# Click Function
+
+# Given a list of deals tuples, convert the data into html results grid
+# Used to avoid a lot of duplicate code between search and browse all
+# @param deals - a deals tuple response from a query
+def getDealResultFromTuple(deals):
+    titles = [i[0] for i in deals]
+    descriptions = [i[1] for i in deals]
+    avgRatings = [i[2] for i in deals]
+    imageUrls = [i[3] for i in deals]
+    startDates = [i[4] for i in deals]
+    endDates = [i[5] for i in deals]
+    result_page_html = ''
+    for i in range(len(titles)):
+        result_page_html += '''
+            <div class="grid-container">
+                <div class="grid-item">{title}</div>
+                <div class="grid-item">{description}</div>
+                <div class="grid-item">
+                    <img src="{imgUrl}" height=100 width=100>
+                </div>
+                <div class="grid-item">Rating = {rating}/5.0</div>
+
+                <div class="grid-item">Valid from {startDate} to {endDate}</div>
+            </div>
+            <br>
+        '''.format(title=titles[i],
+                description=descriptions[i],
+                rating=avgRatings[i],
+                imgUrl=imageUrls[i],
+                startDate=startDates[i],
+                endDate=endDates[i]
+                )
+    return result_page_html
+
+
+''' Click functions ----------------------------------------------'''
+def run_deal_all_query(sender):
+    man = QueryManager()
+    res = man.openDBConnectionWithBundle("PgBundle.properties")
+    deals = man.getAllDeals()
+    result_page_html = ''
+    if (len(deals) < 1): # Shouldn't ever happen unless an eror occurs
+        print("Error connecting to database. Try again soon.")
+        return 
+    result_page_html = getDealResultFromTuple(deals)
+    result_page = widgets.HTML(value=result_page_html)
+
+     # Last tab should be search results and replaced if it already is
+    l = list(pages.children)
+    if len(pages.children) < 3:
+        l.append(result_page)
+    else:
+        l[len(pages.children) - 1] = result_page
+    
+    pages.children = tuple(l)
+
+    # Switch to search result page
+    pages.selected_index = 2
+
 def run_deal_search_query(sender):
     if (search_bar.value == ''):
         return
     man = QueryManager()
     res = man.openDBConnectionWithBundle("PgBundle.properties")
 
-    # Result page based on search result 
-
-    # Deals is a tuple of data in the form of 
+    # Deals is a list of tuples in the form of
     # (title, description, avgRating, imageURL, startDate, endDate)
     deals = man.searchForDeal(search_bar.value)
     # Result page of search. Create html grid for each deal
     result_page_html = ''
-    if (len(deals) < 1): # Just in case nothing is found
+    if (len(deals) < 1): # If nothing matches search
         result_page_html = '''
-            <div class="grid-item">No deals found having title '{val}'
+            <div class="grid-item">No deals found having title "{val}"></div>
         '''.format(val=search_bar.value)
         result_page = widgets.HTML(value=result_page_html)
     else:
-        titles = [i[0] for i in deals]
-        descriptions = [i[1] for i in deals]
-        avgRatings = [i[2] for i in deals]
-        imageUrls = [i[3] for i in deals]
-        startDates = [i[4] for i in deals]
-        endDates = [i[5] for i in deals]
-        for i in range(len(titles)):
-            result_page_html += '''
-                <div class="grid-container">
-                    <div class="grid-item">{title}</div>
-                    <div class="grid-item">{description}</div>
-                    <div class="grid-item">
-                        <img src="{imgUrl}" height=100 width=100>
-                    </div>
-                    <div class="grid-item">Rating = {rating}/5</div>
-
-                    <div class="grid-item">Valid from {startDate} to {endDate}</div>
-                </div>
-                <br>
-            '''.format(title=titles[i],
-                    description=descriptions[i],
-                    rating=avgRatings[i],
-                    imgUrl=imageUrls[i],
-                    startDate=startDates[i],
-                    endDate=endDates[i]
-                    )
+        result_page_html = getDealResultFromTuple(deals)
         result_page = widgets.HTML(value=result_page_html)
 
     # Last tab should be search results and replaced if it already is
@@ -169,9 +240,11 @@ def run_rate_query(sender):
     man = QueryManager()
     res = man.openDBConnectionWithBundle("PgBundle.properties")
     print(res)
+    # TODO: Update tables appropriately to rate
 
-# Query handlers
+
+''' Button handlers ----------------------------------------------'''
 search_button.on_click(run_deal_search_query)
-
+see_all_button.on_click(run_deal_all_query)
 for i in range(6):
     rating_buttons[i].on_click(run_rate_query)

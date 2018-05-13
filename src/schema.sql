@@ -2,12 +2,12 @@ drop table Belongs_To;
 drop table Ratings;
 drop table Favorites;
 drop table Deals;
-drop table Users;
 drop table Category;
 drop table Business;
+drop table Customers;
 
 create table Customers (
-    customerId varchar(128) primary key,
+  customerId varchar(128) primary key,
 	age integer,
 	firstName varchar(128),
 	lastName varchar(128),
@@ -56,7 +56,7 @@ create table Business (
   numFavouritedDeals Integer
 );
 
-insert into Business values ('b1', 'Pizza Hut', 'http://bit.ly/2rGqv1p', 'https://pizzahut.com', 70000000111, 'R1', '100', '30');
+insert into Business values ('b1', 'Pizza Hut', 'https://bit.ly/2IbLOCR', 'https://pizzahut.com', 70000000111, 'R1', '100', '30');
 insert into Business values ('b2', 'Apple', 'https://apple.co/2Ilxbc8', 'https://apple.com', 70000000222, 'R2', '224', '40');
 insert into Business values ('b3', 'Nike', 'http://bit.ly/2KYpEBP', 'https://www.nike.com', 70000000333, 'R3', '330', '50');
 insert into Business values ('b4', 'Ikea', 'http://bit.ly/2jWp8rU', 'https://www.ikea.com', 70000000444, 'R4', '142', '29');
@@ -65,7 +65,7 @@ insert into Business values ('b6', 'Yamaha', 'http://bit.ly/2rEHFNK', 'https://w
 insert into Business values ('b7', 'BMW', 'http://bit.ly/2wEa1fN', 'https://www.bmw.com', 70000000777, 'R7', '113', '12');
 insert into Business values ('b8', 'Zara', 'http://bit.ly/2IdyVZi', 'https://www.zara.com', 70000000888, 'R8', '92', '23');
 insert into Business values ('b9', 'Staples', 'http://bit.ly/2KVljzs', 'https://www.staples.com', 70000000999, 'R9', '94', '18');
-insert into Business values ('b10', 'Expedia', 'http://bit.ly/2KkoKi2', 'https://www.expedia.com', 70000001010, 'R10', '432', '94');
+insert into Business values ('b10', 'Expedia', 'https://bit.ly/2rFKspU', 'https://www.expedia.com', 70000001010, 'R10', '432', '94');
 
 create table Belongs_To (
   bid varchar(128),
