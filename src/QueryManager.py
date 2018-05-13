@@ -59,13 +59,9 @@ class QueryManager:
 
 
     def searchForDeal(self, deal_name):
-        # Stackoverflow says this might work to find substrings inside. So 'Pizza' search could match
-        # 'Best Ever Pizza Hut Deal'
         # TODO: Maybe also UNION with 'FROM Deals where description matches deal name
-        query = ''' SELECT title, description, avgRating, imageURL, startDate, endDate
-                    FROM Deals where title
-                    LIKE \'% {deal_name} %\''''.format(deal_name=deal_name)
-        print(query)
+        query = '''SELECT title, description, avgRating, imageURL, startDate, endDate
+                   FROM Deals where title LIKE \'%{deal_name}%\''''.format(deal_name=deal_name)
         return DBUtils.getAllRows(self._conn, query)
 
 '''

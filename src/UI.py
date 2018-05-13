@@ -105,23 +105,51 @@ def displayWelcomePage():
 
 # Click Function
 def run_deal_search_query(sender):
+    if (search_bar.value == ''):
+        return
     man = QueryManager()
     res = man.openDBConnectionWithBundle("PgBundle.properties")
 
-    # Example result page based on search result
-    # TODO: Select deal where deal name = search bar value
-    #deal_searched = Deal(name=search_bar.value)
-    deals = man.searchForDeal(search_bar.value)
-    first_names = [i[0] for i in deals]
-    last_names = [i[1] for i in deals]
+    # Result page based on search result 
 
-    result_page = widgets.HTML(
-        value='''
-            <div class="grid-container">
-                <div class="grid-item">{first_names}</div>
-            </div>
-        '''.format(first_names=first_names),
-    )
+    # Deals is a tuple of data in the form of 
+    # (title, description, avgRating, imageURL, startDate, endDate)
+    deals = man.searchForDeal(search_bar.value)
+    # Result page of search. Create html grid for each deal
+    result_page_html = ''
+    if (len(deals) < 1): # Just in case nothing is found
+        result_page_html = '''
+            <div class="grid-item">No deals found having title '{val}'
+        '''.format(val=search_bar.value)
+        result_page = widgets.HTML(value=result_page_html)
+    else:
+        titles = [i[0] for i in deals]
+        descriptions = [i[1] for i in deals]
+        avgRatings = [i[2] for i in deals]
+        imageUrls = [i[3] for i in deals]
+        startDates = [i[4] for i in deals]
+        endDates = [i[5] for i in deals]
+        for i in range(len(titles)):
+            result_page_html += '''
+                <div class="grid-container">
+                    <div class="grid-item">{title}</div>
+                    <div class="grid-item">{description}</div>
+                    <div class="grid-item">
+                        <img src="{imgUrl}" height=100 width=100>
+                    </div>
+                    <div class="grid-item">Rating = {rating}/5</div>
+
+                    <div class="grid-item">Valid from {startDate} to {endDate}</div>
+                </div>
+                <br>
+            '''.format(title=titles[i],
+                    description=descriptions[i],
+                    rating=avgRatings[i],
+                    imgUrl=imageUrls[i],
+                    startDate=startDates[i],
+                    endDate=endDates[i]
+                    )
+        result_page = widgets.HTML(value=result_page_html)
 
     # Last tab should be search results and replaced if it already is
     l = list(pages.children)
