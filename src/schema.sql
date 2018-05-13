@@ -1,10 +1,9 @@
 drop table Belongs_To;
-
+drop table Ratings;
+drop table Favorites;
 drop table Deals;
 drop table Users;
 drop table Category;
-drop table Ratings;
-drop table Favorites;
 drop table Business;
 
 create table Users (
@@ -54,7 +53,7 @@ insert into Business values ('b4', 'Ikea', 'http://cache.magicmaman.com/data/pho
 insert into Belongs_To values ('b1', 'Cat1');
 
 create table Deals (
-  dealId varchar(128),
+  dealId varchar(128) unique,
   dateSubmitted Date not null,
   title varchar(128) not null,
   description varchar(128),
