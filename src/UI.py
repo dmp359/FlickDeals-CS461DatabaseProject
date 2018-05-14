@@ -87,7 +87,10 @@ def run_get_n_deals(n):
     deal_button_controls = [widgets.HBox(
         [widgets.Button(description='Submit Rating'),
         widgets.Button(description='Favorite Deal')]) for i in range(n)]
-
+    
+    image_htmls = [widgets.HTML(value='''
+        <img src="{image}" height=50 width = 50>
+    '''.format(image=imageUrls[i])) for i in range(n)]
     for i in range(n):
         rating_button_dict[deal_button_controls[i].children[0]] = [i,dealIds[i]]
         favorite_button_dict[deal_button_controls[i].children[1]] = [i,dealIds[i]]
@@ -106,12 +109,12 @@ def run_get_n_deals(n):
     # (Hardcoding n = 6)
     # Format into 3 columns of 2 widgets, vertically set on top of each other to create a grid like
     '''
-    Deal Deal Deal
-    Deal Deal Deal
+    Deal0 Deal2 Deal4
+    Deal1 Deal3 Deal5
     '''
-    col1 = widgets.VBox([deal_title[0], see_details_accordions[0], deal_title[1], see_details_accordions[1]])
-    col2 = widgets.VBox([deal_title[2], see_details_accordions[2], deal_title[3], see_details_accordions[3]])
-    col3 = widgets.VBox([deal_title[4], see_details_accordions[4], deal_title[5], see_details_accordions[5]])
+    col1 = widgets.VBox([deal_title[0], image_htmls[0], see_details_accordions[0], deal_title[1], image_htmls[1], see_details_accordions[1]])
+    col2 = widgets.VBox([deal_title[2], image_htmls[2], see_details_accordions[2], deal_title[3], image_htmls[3], see_details_accordions[3]])
+    col3 = widgets.VBox([deal_title[4], image_htmls[4], see_details_accordions[4], deal_title[5], image_htmls[5], see_details_accordions[5]])
     deals_boxed = widgets.HBox([col1, col2, col3])
     return deals_boxed
 

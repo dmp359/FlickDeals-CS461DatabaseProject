@@ -29,7 +29,7 @@ class Business:
     
     def getPhoneNum(self):
         return self._pnum
-    
+
     def getRid(self):
         return self._rid
     

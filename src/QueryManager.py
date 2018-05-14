@@ -2,6 +2,8 @@ import psycopg2
 
 from DBUtils import DBUtils
 from Users import User
+from Deal import Deal
+from Business import Business
 
 # @param boundle address
 # @return a dictionary containing the connection information
@@ -87,6 +89,24 @@ class QueryManager:
                     ORDER BY Deals.avgrating DESC;
                     '''.format(deal_name=deal_name)
         return DBUtils.getAllRows(self._conn, query)
+    
+    def updateFavorite_user(self, business, did, cid):
+        #INSERT into Favorites values ('%s', '%s');
+
+    
+    def updateFavorite_business(self, business, did, cid):
+        try :
+            query='''
+            UPDATE Business SET numFavouritedDeals = numFavouritedDeals + 1 WHERE businessId = '%s'
+            '''
+            DBUtils.executeUpdate(self._conn, query, business.getBid())
+            business.setNumFavorites(1 + business.getNumFavorites())
+        except psycopg2.Error as e:
+                print (e)
+
+        return business
+
+
 
     # Businesses -----------------------------------------------------------------------------------
     def getAllRetailers(self):
@@ -101,7 +121,9 @@ TOOD: QUERIES
 UPDATE Business SET numVisited = numVisited + 1 WHERE businessId = 'b1';
 
 /*Added a deal to favorite list*/
+/* Need the business, dealid, and user id
 UPDATE Business SET numFavouritedDeals = numFavouritedDeals + 1 WHERE businessId = 'b1';
+INSERT into Favorites values ('customerId', 'DealId1');
 
 /*Someone removed deal from their favorite list*/
 UPDATE Business SET numFavouritedDeals = numFavouritedDeals - 1 WHERE businessId = 'b1';
