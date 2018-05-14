@@ -59,8 +59,12 @@ class QueryManager:
 
     # Deals -----------------------------------------------------------------------------------
     def getAllDeals(self):
-        # TODO: Get business name
-        query = 'SELECT title, description, avgRating, imageURL, startDate, endDate FROM Deals'
+        query = '''SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
+                   Deals.startDate, Deals.endDate, Business.name, Business.phoneNum
+                   FROM Deals
+                   INNER JOIN Business ON Deals.bid=Business.businessId
+                   ORDER BY Business.name
+                '''
         return DBUtils.getAllRows(self._conn, query)
 
     def searchForDeal(self, deal_name):
@@ -77,6 +81,32 @@ class QueryManager:
         return DBUtils.getAllRows(self._conn, query)
 
 '''
+
+TOOD: QUERIES
+/*Someone visited a deal*/
+UPDATE Business SET numVisited = numVisited + 1 WHERE businessId = 'b1';
+
+/*Added a deal to favorite list*/
+UPDATE Business SET numFavouritedDeals = numFavouritedDeals + 1 WHERE businessId = 'b1';
+
+/*Someone removed deal from their favorite list*/
+UPDATE Business SET numFavouritedDeals = numFavouritedDeals - 1 WHERE businessId = 'b1';
+
+/*Searching for Deals. Returns deals details + business name + business phone number */
+SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL, Deals.startDate, Deals.endDate, Business.name, Business.phoneNum
+FROM Deals
+INNER JOIN Business ON Deals.bid=Business.businessId
+where title like '%izza%'
+ORDER BY Deals.avgrating;
+
+
+/* Customer's favorites */
+SELECT title, description, avgRating, imageURL, startDate, endDate
+FROM Deals
+INNER JOIN Favorites ON Favorites.did=Deals.dealId
+where Favorites.cid='C1';
+
+
     def registerStudent(self, newStudent):
         try :
             sid = 1 + DBUtils.getVar(self._conn, "select max(sid) from Students");

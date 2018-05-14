@@ -44,6 +44,7 @@ def run_business_all_query():
     return result_page_html
 
 
+
 #Define Widgets----
 
 # Search bar text
@@ -112,7 +113,8 @@ for i in range(len(deal_button_controls)):
     rating_button_dict[deal_button_controls[i].children[0]] = i
     favorite_button_dict[deal_button_controls[i].children[1]] = i
 
-deal_detail_cols = [widgets.VBox([deal_descriptions[i], rating_sliders[i], deal_button_controls[i]]) for i in range(6)]
+deal_detail_cols = [widgets.VBox([deal_descriptions[i], rating_sliders[i],
+                    deal_button_controls[i]]) for i in range(6)]
 
 # "See details" accordions. Children are descriptions of each deal
 see_details_accordions = [widgets.Accordion(children=[deal_detail_cols[i]]) for i in range(6)]
@@ -164,24 +166,52 @@ def getDealResultFromTuple(deals):
     for i in range(len(titles)):
         result_page_html += '''
             <div class="grid-container">
+                <div class="grid-item">{i}</div>
                 <div class="grid-item">{title}</div>
                 <div class="grid-item">{description}</div>
                 <div class="grid-item">
                     <img src="{imgUrl}" height=100 width=100>
                 </div>
                 <div class="grid-item">Rating = {rating}/5.0</div>
-
                 <div class="grid-item">Valid from {startDate} to {endDate}</div>
             </div>
             <br>
-        '''.format(title=titles[i],
-                description=descriptions[i],
-                rating=avgRatings[i],
-                imgUrl=imageUrls[i],
-                startDate=startDates[i],
-                endDate=endDates[i]
-                )
-    return result_page_html
+        '''.format(i=i,
+                   title=titles[i],
+                   description=descriptions[i],
+                   rating=avgRatings[i],
+                   imgUrl=imageUrls[i],
+                   startDate=startDates[i],
+                   endDate=endDates[i]
+                  )
+
+    slider = widgets.IntSlider(
+            value=5,
+            min=1,
+            max=5,
+            step=1,
+            description='Rate:',
+            disabled=False,
+            continuous_update=False,
+            orientation='horizontal',
+            readout=True,
+            readout_format='d'
+            )
+
+    # Search bar text
+    deal_text_input = widgets.Text(
+        value='',
+        placeholder='Deal Number',
+        description='Deal #:',
+        disabled=False,
+    )
+    rate_button_general = widgets.Button(description="Rate")
+    rate_button_general.on_click(run_rate_query) #TODO: Make this a different function to check general slider
+    rating_box = widgets.HBox([slider, deal_text_input,rate_button_general])
+    res_html_widget = widgets.HTML(value=result_page_html)
+    result_page = widgets.VBox([res_html_widget,rating_box])
+    
+    return result_page
 
 
 ''' Click functions ----------------------------------------------'''
@@ -189,24 +219,21 @@ def run_deal_all_query(sender):
     man = QueryManager()
     res = man.openDBConnectionWithBundle("PgBundle.properties")
     deals = man.getAllDeals()
-    result_page_html = ''
     if (len(deals) < 1): # Shouldn't ever happen unless an eror occurs
         print("Error connecting to database. Try again soon.")
         return 
-    result_page_html = getDealResultFromTuple(deals)
-    result_page = widgets.HTML(value=result_page_html)
 
-     # Last tab should be search results and replaced if it already is
+    result_page = getDealResultFromTuple(deals)
+    # Last tab should be search results and replaced if it already is
     l = list(pages.children)
     if len(pages.children) < 3:
         l.append(result_page)
     else:
-        l[len(pages.children) - 1] = result_page
+        l[len(pages.children) - 1] = result_page # Overrite search result page
     
     pages.children = tuple(l)
-
     # Switch to search result page
-    pages.selected_index = 2
+    pages.selected_index = len(pages.children) - 1
 
 def run_deal_search_query(sender):
     if (search_bar.value == ''):
@@ -221,12 +248,11 @@ def run_deal_search_query(sender):
     result_page_html = ''
     if (len(deals) < 1): # If nothing matches search
         result_page_html = '''
-            <div class="grid-item">No deals found having title "{val}"></div>
+            <div class="grid-item">No deals found having title "{val}"</div>
         '''.format(val=search_bar.value)
         result_page = widgets.HTML(value=result_page_html)
     else:
-        result_page_html = getDealResultFromTuple(deals)
-        result_page = widgets.HTML(value=result_page_html)
+        result_page = getDealResultFromTuple(deals)
 
     # Last tab should be search results and replaced if it already is
     l = list(pages.children)
@@ -240,6 +266,14 @@ def run_deal_search_query(sender):
     # Switch to search result page
     pages.selected_index = 2
 
+
+def run_favorite_query(sender):
+    deal_index = favorite_button_dict[sender] # lookup in dict for which button was clicked
+    print('You chose to favorite deal number ' + str(deal_index))
+    man = QueryManager()
+    res = man.openDBConnectionWithBundle("PgBundle.properties")
+    print(res)
+
 def run_rate_query(sender):
     deal_index = rating_button_dict[sender] # lookup in dict for which button was clicked
     print('You chose to rate deal number ' + str(deal_index) + ' with a value of ' + str(rating_sliders[deal_index].value))
@@ -248,12 +282,6 @@ def run_rate_query(sender):
     print(res)
     # TODO: Update tables appropriately to rate
 
-def run_favorite_query(sender):
-    deal_index = favorite_button_dict[sender] # lookup in dict for which button was clicked
-    print('You chose to favorite deal number ' + str(deal_index))
-    man = QueryManager()
-    res = man.openDBConnectionWithBundle("PgBundle.properties")
-    print(res)
 
 ''' Button handlers ----------------------------------------------'''
 search_button.on_click(run_deal_search_query)
