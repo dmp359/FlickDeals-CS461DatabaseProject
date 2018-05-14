@@ -315,7 +315,7 @@ def run_deal_search_query(sender):
     result_page_html = ''
     if (len(deals) < 1): # If nothing matches search
         result_page_html = '''
-            <div class="grid-item">No deals found having title "{val}"</div>
+            <div class="grid-item">No deals found containing "{val}" in the title</div>
         '''.format(val=search_bar.value)
         result_page = widgets.HTML(value=result_page_html)
     else:
@@ -332,8 +332,6 @@ def run_deal_search_query(sender):
 
     # Switch to search result page
     pages.selected_index = 2
-
-
 
 # Results page rate button
 def run_rate_query_result_page(sender):
