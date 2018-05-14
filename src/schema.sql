@@ -8,14 +8,14 @@ drop table Customers;
 
 create table Customers (
   customerId varchar(128) primary key,
-	age integer,
-	firstName varchar(128),
-	lastName varchar(128),
-	gender varchar(1),
-	accountId integer not null unique, 
-	phoneNum BIGINT not null,
-	email varchar(128) not null,
-	password varchar(128) not null
+  age integer,
+  firstName varchar(128),
+  lastName varchar(128),
+  gender varchar(1),
+  accountId integer not null unique, 
+  phoneNum BIGINT not null,
+  email varchar(128) not null,
+  password varchar(128) not null
 );
 
 insert into Customers values ('C1', 18, 'John', 'Finkle', 'M', 6184, 1873498920, 'john.finkle@gmail.com', 'password123');

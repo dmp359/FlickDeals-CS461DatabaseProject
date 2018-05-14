@@ -9,13 +9,13 @@ from Business import Business
 
 num_search_results = 0
 
-# Dict mapping index of deal to its associated deal ID for querying
-result_deals_dict = {}
 rating_sliders = []
-# Dictionary of each homepage button to associated [index, dealID] to rate.
+# Dictionary of each homepage button to associated index to rate.
 # Used by rate/favorite deals callback
 rating_button_dict = {}
 favorite_button_dict = {}
+home_deals = [] # List of deal objects
+search_deals = [] # List of search result deal objects
 
 # Deal choose text on search result page
 deal_text_input = widgets.Text(
@@ -27,8 +27,8 @@ deal_text_input = widgets.Text(
 
 # Homepage favorite button(s)
 def run_favorite_query(sender):
-    deal_index = favorite_button_dict[sender][0] #lookup in dict for which button was clicked
-    deal_ID = favorite_button_dict[sender][1] #lookup in dict for which ID corresponds
+    deal_index = favorite_button_dict[sender]#lookup in dict for which button was clicked
+    deal_ID = home_deals[deal_index].getDid() # access home deal in list and grab id
     print('You chose to rate deal ID: ' + deal_ID + ' with a value of ' + str(rating_sliders[deal_index].value))
     man = QueryManager()
     res = man.openDBConnectionWithBundle("PgBundle.properties")
@@ -37,8 +37,8 @@ def run_favorite_query(sender):
 
 # Homepage rate button(s)
 def run_rate_query(sender):
-    deal_index = rating_button_dict[sender][0] #lookup in dict for which button was clicked
-    deal_ID = rating_button_dict[sender][1] #lookup in dict for which ID corresponds
+    deal_index = rating_button_dict[sender] #lookup in dict for which button was clicked
+    deal_ID = home_deals[deal_index].getDid() #lookup in dict for which ID corresponds
     print('You chose to rate deal ID: ' + deal_ID + ' with a value of ' + str(rating_sliders[deal_index].value))
     man = QueryManager()
     res = man.openDBConnectionWithBundle("PgBundle.properties")
@@ -52,24 +52,25 @@ def run_get_n_deals(n):
     global rating_button_dict
     global favorite_button_dict
     global rating_sliders
+    global home_deals
+    home_deals = []
     man = QueryManager()
     res = man.openDBConnectionWithBundle("PgBundle.properties")
     deals = man.getTopNDeals(n)
     if (len(deals) < 1):
         print("Error connecting to database. Try again soon.")
-    titles = [i[0] for i in deals]
-    descriptions = [i[1] for i in deals]
-    avgRatings = [i[2] for i in deals]
-    imageUrls = [i[3] for i in deals]
-    startDates = [i[4] for i in deals]
-    endDates = [i[5] for i in deals]
-    businessNames = [i[6] for i in deals]
-    businessNums = [i[7] for i in deals]
-    dealIds = [i[8] for i in deals]
+    businessNames = [i[6] for i in deals] # TODO: Include
+    # end_date=None, b_name=None, b_num=None, bid=None):
 
+    for i in range(len(deals)):
+        d = Deal( title=deals[i][0], avg_rating=deals[i][2], 
+                 desc=deals[i][1], img=deals[i][3], start_date=deals[i][4],
+                 end_date=deals[i][5], b_name = deals[i][6], b_num= deals[i][7],
+                 bid=deals[i][8], did=deals[i][9])
+        home_deals.append(d)
     # Build home page
-    deal_title = [widgets.Label(titles[i]) for i in range(n)]
-    deal_descriptions = [widgets.Label(descriptions[i]) for i in range(n)]
+    deal_title = [widgets.Label(home_deals[i].getTitle()) for i in range(n)]
+    deal_descriptions = [widgets.Label(home_deals[i].getDescription()) for i in range(n)]
     rating_slider = widgets.IntSlider(
         value=5,
         min=1,
@@ -90,10 +91,10 @@ def run_get_n_deals(n):
     
     image_htmls = [widgets.HTML(value='''
         <img src="{image}" height=50 width = 50>
-    '''.format(image=imageUrls[i])) for i in range(n)]
+        '''.format(image=home_deals[i].getImage())) for i in range(n)]
     for i in range(n):
-        rating_button_dict[deal_button_controls[i].children[0]] = [i,dealIds[i]]
-        favorite_button_dict[deal_button_controls[i].children[1]] = [i,dealIds[i]]
+        rating_button_dict[deal_button_controls[i].children[0]] = i
+        favorite_button_dict[deal_button_controls[i].children[1]] = i
         deal_button_controls[i].children[0].on_click(run_rate_query)
         deal_button_controls[i].children[1].on_click(run_favorite_query)
 
@@ -221,20 +222,19 @@ def launch():
 def getDealResultFromTuple(deals):
     global num_search_results
     global result_deals_dict
+    global search_deals
+    search_deals = []
     result_deals_dict = {} # reset dict on each search
-    titles = [i[0] for i in deals]
-    descriptions = [i[1] for i in deals]
-    avgRatings = [i[2] for i in deals]
-    imageUrls = [i[3] for i in deals]
-    startDates = [i[4] for i in deals]
-    endDates = [i[5] for i in deals]
-    businessNames = [i[6] for i in deals]
-    businessNums = [i[7] for i in deals]
-    dealIds = [i[8] for i in deals]
+   
     result_page_html = ''
     num_search_results = len(deals)
     for i in range(num_search_results):
-        result_deals_dict[i] = dealIds[i] # store in dict for id accessing later in query
+        d = Deal( title=deals[i][0], avg_rating=deals[i][2], 
+                 desc=deals[i][1], img=deals[i][3], start_date=deals[i][4],
+                 end_date=deals[i][5], b_name = deals[i][6], b_num= deals[i][7],
+                 bid=deals[i][8], did=deals[i][9])
+        search_deals.append(d)
+        #result_deals_dict[i] = dealIds[i] # TODO: Replace with list store in dict for id accessing later in query
         result_page_html += '''
             <div class="grid-container">
                 <div class="grid-item">{i}</div>
@@ -250,14 +250,14 @@ def getDealResultFromTuple(deals):
             </div>
             <br>
         '''.format(i=i,
-                   title=titles[i],
-                   description=descriptions[i],
-                   rating=avgRatings[i],
-                   imgUrl=imageUrls[i],
-                   startDate=startDates[i],
-                   endDate=endDates[i],
-                   businessName=businessNames[i],
-                   businessNum=businessNums[i]
+                   title=search_deals[i].getTitle(),
+                   description=search_deals[i].getDescription(),
+                   rating=search_deals[i].getAvgRating(),
+                   imgUrl=search_deals[i].getImage(),
+                   startDate=search_deals[i].getStartDate(),
+                   endDate=search_deals[i].getEndDate(),
+                   businessName=search_deals[i].getBName(),
+                   businessNum=search_deals[i].getBNum()
                   )
 
     slider = widgets.IntSlider(
@@ -343,10 +343,10 @@ def run_rate_query_result_page(sender):
         return
     chosen_deal_int = int(chosen_deal)
     if (chosen_deal_int >= num_search_results or chosen_deal_int < 0):
-        print("Input not in bounds. Please enter a valid deal number")
+        print('''Input not in bounds. Please enter a deal number between {low} and {high}'''.format(low=0,high=num_search_results - 1))
         return
-    did = result_deals_dict[chosen_deal_int]
-    print("You chose to rate DID = " + did)
+    d = search_deals[chosen_deal_int] # Deal object
+    print("You chose to rate DID = " + d.getDid())
 
 ''' Button handlers ----------------------------------------------'''
 search_button.on_click(run_deal_search_query)

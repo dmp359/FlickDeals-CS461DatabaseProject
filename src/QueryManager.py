@@ -62,7 +62,7 @@ class QueryManager:
     # Deals -----------------------------------------------------------------------------------
     def getAllDeals(self):
         query = '''SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
-                   Deals.startDate, Deals.endDate, Business.name, Business.phoneNum, Deals.dealId
+                   Deals.startDate, Deals.endDate, Business.name, Business.phoneNum, Business.businessId, Deals.dealId
                    FROM Deals
                    INNER JOIN Business ON Deals.bid=Business.businessId
                    ORDER BY Business.name
@@ -71,7 +71,7 @@ class QueryManager:
     
     def getTopNDeals(self, n):
         query = '''SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
-            Deals.startDate, Deals.endDate, Business.name, Business.phoneNum, Deals.dealId
+            Deals.startDate, Deals.endDate, Business.name, Business.phoneNum, Business.businessId, Deals.dealId
             FROM Deals
             INNER JOIN Business ON Deals.bid=Business.businessId
             ORDER BY Deals.avgRating desc
@@ -82,7 +82,7 @@ class QueryManager:
     def searchForDeal(self, deal_name):
         # TODO: Maybe also UNION with 'FROM Deals where description matches deal name
         query = '''SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
-                   Deals.startDate, Deals.endDate, Business.name, Business.phoneNum, Deals.dealId
+                   Deals.startDate, Deals.endDate, Business.name, Business.phoneNum, Business.businessId, Deals.dealId
                     FROM Deals
                     INNER JOIN Business ON Deals.bid=Business.businessId
                     where title LIKE \'%{deal_name}%\'
@@ -91,6 +91,7 @@ class QueryManager:
         return DBUtils.getAllRows(self._conn, query)
     
     def updateFavorite_user(self, business, did, cid):
+        return
         #INSERT into Favorites values ('%s', '%s');
 
     
