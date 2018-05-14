@@ -60,18 +60,32 @@ class QueryManager:
     # Deals -----------------------------------------------------------------------------------
     def getAllDeals(self):
         query = '''SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
-                   Deals.startDate, Deals.endDate, Business.name, Business.phoneNum
+                   Deals.startDate, Deals.endDate, Business.name, Business.phoneNum, Deals.dealId
                    FROM Deals
                    INNER JOIN Business ON Deals.bid=Business.businessId
                    ORDER BY Business.name
                 '''
         return DBUtils.getAllRows(self._conn, query)
+    
+    def getTopNDeals(self, n):
+        query = '''SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
+            Deals.startDate, Deals.endDate, Business.name, Business.phoneNum, Deals.dealId
+            FROM Deals
+            INNER JOIN Business ON Deals.bid=Business.businessId
+            ORDER BY Deals.avgRating desc
+            limit {n}
+        '''.format(n=n)
+        return DBUtils.getAllRows(self._conn, query)
 
     def searchForDeal(self, deal_name):
         # TODO: Maybe also UNION with 'FROM Deals where description matches deal name
-        # TODO: Get business name
-        query = '''SELECT title, description, avgRating, imageURL, startDate, endDate
-                   FROM Deals where title LIKE \'%{deal_name}%\''''.format(deal_name=deal_name)
+        query = '''SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
+                   Deals.startDate, Deals.endDate, Business.name, Business.phoneNum, Deals.dealId
+                    FROM Deals
+                    INNER JOIN Business ON Deals.bid=Business.businessId
+                    where title LIKE \'%{deal_name}%\'
+                    ORDER BY Deals.avgrating DESC;
+                    '''.format(deal_name=deal_name)
         return DBUtils.getAllRows(self._conn, query)
 
     # Businesses -----------------------------------------------------------------------------------
@@ -98,7 +112,6 @@ FROM Deals
 INNER JOIN Business ON Deals.bid=Business.businessId
 where title like '%izza%'
 ORDER BY Deals.avgrating;
-
 
 /* Customer's favorites */
 SELECT title, description, avgRating, imageURL, startDate, endDate
