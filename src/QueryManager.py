@@ -135,6 +135,7 @@ class QueryManager:
 
         # If so, return. You can only favorite once
         if (result > 0):
+            print("Deal already exists in favorites")
             return
 
         # Add favorite to favorite table, (linking customer and the deal)
@@ -152,16 +153,20 @@ class QueryManager:
                    WHERE businessId='{bid}'
                 """.format(bid=busID)
         DBUtils.executeUpdate(self._conn, query)
+        print("Deal favorited! Check your profile.")
+        return False # did not exist until now
         
     # Businesses -----------------------------------------------------------------------------------
     def getAllRetailers(self):
         # Businesses sorted by "reputation", which is num_visits + num_favorites * 2
         query = """
-        Select name, imageURL, homePageURL, cid as CategoryName
-        FROM Business
-        INNER JOIN (SELECT * from Belongs_To group by cid, bid) belongTo
-        on belongTo.bid=Business.businessId
-        order by (numvisited + numFavouritedDeals*2) desc
+            Select name, imageURL, homePageURL, categoryName
+            FROM Business
+            INNER JOIN (SELECT * from Belongs_To group by cid, bid) belongTo
+            on belongTo.bid=Business.businessId
+            INNER JOIN Category
+            on belongTo.cid=Category.categoryId
+            order by (numvisited + numFavouritedDeals*2) desc
         """
         return DBUtils.getAllRows(self._conn, query)
 

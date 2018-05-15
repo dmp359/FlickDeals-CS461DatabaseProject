@@ -115,7 +115,6 @@ deal_text_input = widgets.Text(
     disabled=False,
 )
 
-
 # Homepage favorite button(s)
 def run_favorite_query(sender):
     global profile_view
@@ -220,7 +219,7 @@ def getBusinessResultFromTuple(businesses):
     result_page_html = ''
     for i in range(len(names)):
         result_page_html += """
-            <div class="grid-container">
+            <div class="grid-container-tri">
                 <div class="grid-item"> <a href="{homepageURL}" target="_blank">{name}</a></div>
                 <div class="grid-item">
                     <img src="{imageURL}" height=50 width=50>
