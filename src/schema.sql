@@ -161,7 +161,6 @@ insert into Deals values ('DealId20', '01-19-18', '20% off on BMWX3', null, 4.0,
                           'http://bit.ly/2KkE7XP',
                           '02-24-18', '02-28-18', 'b7');
 
-
 create table Favorites(
   cid varchar(128),
   did varchar(128),

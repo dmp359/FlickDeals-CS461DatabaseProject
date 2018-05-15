@@ -2,12 +2,29 @@
   display: grid;
   grid-template-columns: auto auto auto auto;
   background-color: rgb(77, 77, 77);
-  padding: 2px;
+  padding: 5px;
 }
 .grid-item {
   background-color: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(0, 0, 0, 0.8);
-  padding: 2px;
+  padding: 5px;
   font-size: 12px;
   text-align: center;
+}
+
+.grid-container-compact {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto auto auto;
+  background-color: rgb(77, 77, 77);
+  padding: 2px;
+}
+
+.card {
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2);
+  transition: 0.3s;
+  width: 20%;
+}
+
+.container {
+  padding: 2px 4px;
 }

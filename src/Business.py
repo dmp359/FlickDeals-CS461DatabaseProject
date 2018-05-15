@@ -40,10 +40,10 @@ class Business:
         return self._num_favorited_deals
 
     def setNumVisits(self, visit):
-        _num_visits = visit
+        self._num_visits = visit
 
     def setNumFavorites(self, fav):
-        _num_favorited_deals = fav
+       self._num_favorited_deals = fav
 
     # @return string representation
     def __str__(self):

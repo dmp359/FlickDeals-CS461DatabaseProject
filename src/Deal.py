@@ -53,9 +53,6 @@ class Deal:
     def getBid(self):
         return self._bid
     
-    
-    
-
     # @return string representation
     def __str__(self):
         return str(self._title) +" "+ str(self._desc) +" "+ str(self._img)

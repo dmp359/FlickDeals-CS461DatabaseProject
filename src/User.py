@@ -1,7 +1,7 @@
 import pandas as pd #show data as tables
 
-# An implementation of the User class.
-class User:
+# An implementation of the Customer class.
+class Customer:
 
     # Constructor
     def __init__(self, cid=None, age=None, fname=None, lname=None, gender=None, aid=None, pnum=None, email=None, password=None):

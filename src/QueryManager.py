@@ -1,7 +1,7 @@
 import psycopg2
 
 from DBUtils import DBUtils
-from Users import User
+from Customer import Customer
 from Deal import Deal
 from Business import Business
 
@@ -59,63 +59,107 @@ class QueryManager:
         except psycopg2.Error as e:
             print (e)
 
+    # Users -----------------------------------------------------------------------------------
+    def getFirstUser(self):
+        query = """
+            SELECT *
+            FROM Customers
+            LIMIT 1;
+        """
+        return DBUtils.getAllRows(self._conn, query)
+
     # Deals -----------------------------------------------------------------------------------
     def getAllDeals(self):
-        query = '''SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
+        query = """SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
                    Deals.startDate, Deals.endDate, Business.name, Business.phoneNum, Business.businessId, Deals.dealId
                    FROM Deals
                    INNER JOIN Business ON Deals.bid=Business.businessId
                    ORDER BY Business.name
-                '''
+                """
         return DBUtils.getAllRows(self._conn, query)
-    
+
+    def getFavoritedDeals(self, customer):
+        query = """
+            SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
+                   Deals.startDate, Deals.endDate, Business.name, Business.phoneNum,
+                   Business.businessId, Deals.dealId
+            FROM Deals
+            INNER JOIN Favorites ON Favorites.did=Deals.dealId
+            INNER JOIN Business ON Deals.bid=Business.businessId
+            WHERE Favorites.cid='{cid}'
+            """.format(cid=customer.getCid())
+        return DBUtils.getAllRows(self._conn, query)
+
     def getTopNDeals(self, n):
-        query = '''SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
-            Deals.startDate, Deals.endDate, Business.name, Business.phoneNum, Business.businessId, Deals.dealId
+        query = """
+            SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
+                   Deals.startDate, Deals.endDate, Business.name, Business.phoneNum,
+                   Business.businessId, Deals.dealId
             FROM Deals
             INNER JOIN Business ON Deals.bid=Business.businessId
             ORDER BY Deals.avgRating desc
-            limit {n}
-        '''.format(n=n)
+            LIMIT {n}
+        """.format(n=n)
         return DBUtils.getAllRows(self._conn, query)
 
     def searchForDeal(self, deal_name):
         # TODO: Maybe also UNION with 'FROM Deals where description matches deal name
-        query = '''SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
+        query = """SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
                    Deals.startDate, Deals.endDate, Business.name, Business.phoneNum, Business.businessId, Deals.dealId
                     FROM Deals
                     INNER JOIN Business ON Deals.bid=Business.businessId
                     where title LIKE \'%{deal_name}%\'
                     ORDER BY Deals.avgrating DESC;
-                    '''.format(deal_name=deal_name)
+                    """.format(deal_name=deal_name)
         return DBUtils.getAllRows(self._conn, query)
-    
-    def updateFavorite_user(self, business, did, cid):
-        return
-        #INSERT into Favorites values ('%s', '%s');
+
 
     
-    def updateFavorite_business(self, business, did, cid):
+    def favoriteDeal(self, business, deal, customer):
         try :
-            query='''
+            query=""" This is just (step 3)
             UPDATE Business SET numFavouritedDeals = numFavouritedDeals + 1 WHERE businessId = '%s'
-            '''
+            """
             DBUtils.executeUpdate(self._conn, query, business.getBid())
             business.setNumFavorites(1 + business.getNumFavorites())
         except psycopg2.Error as e:
                 print (e)
 
-        return business
+        return business # Return both deal and business like: [deal, business] so I can update UI
 
+    def favoriteDeal(self, deal, customer):
+        # Check if the customer has already favorited this deal (select in Favorites).
+        query = """SELECT count(*) FROM Favorites 
+                WHERE cid='{cid}' and did='{did}'""".format(cid=customer.getCid(), did=deal.getDid())
+        result = DBUtils.getVar(self._conn, query)
 
+        # If so, return. You can only favorite once
+        if (result > 0):
+            return
 
+        # Add favorite to favorite table, (linking customer and the deal)
+        query = """INSERT INTO Favorites VALUES (%s, %s)"""
+        DBUtils.executeUpdate(self._conn, query, (customer.getCid(), deal.getDid()))
+        
+        # Get the business associated with the deal
+        query = """
+            SELECT bid from Deals where did='{did}'
+            """.format(did=deal.getDid()) 
+        busID = DBUtils.getAllRows(self._conn, query)
+
+        # Update business's num favorites
+        query = """UPDATE Business SET numFavouritedDeals = numFavouritedDeals + 1
+                   WHERE businessId = {bid}
+                """.format(bid=busID)
+        DBUtils.executeUpdate(self._conn, query)
+        
     # Businesses -----------------------------------------------------------------------------------
     def getAllRetailers(self):
         # TODO: Sort by "reputation"
         query = 'SELECT name, imageURL, homepageURL FROM Business'
         return DBUtils.getAllRows(self._conn, query)
 
-'''
+"""
 
 TOOD: QUERIES
 /*Someone visited a deal*/
@@ -129,72 +173,6 @@ INSERT into Favorites values ('customerId', 'DealId1');
 /*Someone removed deal from their favorite list*/
 UPDATE Business SET numFavouritedDeals = numFavouritedDeals - 1 WHERE businessId = 'b1';
 
-/*Searching for Deals. Returns deals details + business name + business phone number */
-SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL, Deals.startDate, Deals.endDate, Business.name, Business.phoneNum
-FROM Deals
-INNER JOIN Business ON Deals.bid=Business.businessId
-where title like '%izza%'
-ORDER BY Deals.avgrating;
-
-/* Customer's favorites */
-SELECT title, description, avgRating, imageURL, startDate, endDate
-FROM Deals
-INNER JOIN Favorites ON Favorites.did=Deals.dealId
-where Favorites.cid='C1';
 
 
-    def registerStudent(self, newStudent):
-        try :
-            sid = 1 + DBUtils.getVar(self._conn, "select max(sid) from Students");
-            newStudent.setId(sid);
-            query = """
-                insert into Students (sid, name) values (%s,%s)
-            """
-            DBUtils.executeUpdate(self._conn, query,(newStudent.getId(),newStudent.getName()));
-        except psycopg2.Error as e:
-                print (e)
-
-        return newStudent;
-'''
-
-   # Update the student's GPA in the database.
-   # @param sid
-   # @param gpa
-   # @return
-'''
-    def setGPA(self, sid, gpa):
-        student = None;
-        try:
-            # Check if they exist
-            cnt = DBUtils.getVar(self._conn, "select count(*) from Students where sid = " + str(sid))
-            if (cnt == 0):
-                return student
-
-            query = "update Students set gpa = " + str(gpa) + " where sid = " + str(sid)
-            DBUtils.executeUpdate(self._conn, query)
-            query = "select name, gpa from Students where sid =  " + str(sid)
-            row = DBUtils.getRow(self._conn, query)
-            student = Student(sid=sid, name=row[0], gpa=row[1])
-        except psycopg2.Error as e:
-            print (e)
-        return student
-
-
-   # Get the complete roster of students.
-   # @return
-    def getAccounts(self):
-        query = "select fname, lname, email from Users"
-        return DBUtils.getAllRows(self._conn,query)
-
-
-    def addTermsDynamicSQL(self, terms):
-        for i in range(len(terms)):
-            term = terms[i]
-        try:
-            query = "insert into Terms values ('" + term + "')";
-            DBUtils.executeUpdate(_conn, query);
-        except psycopg2.Error as e:
-            print (e)
-    def addTermsPreparedStatement(self, terms):
-        raise Exception("Not Supported in psycopg2")
-'''
+"""
