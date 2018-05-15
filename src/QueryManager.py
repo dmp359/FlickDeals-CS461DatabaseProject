@@ -143,36 +143,26 @@ class QueryManager:
         
         # Get the business associated with the deal
         query = """
-            SELECT bid from Deals where did='{did}'
+            SELECT bid from Deals where dealId='{did}'
             """.format(did=deal.getDid()) 
-        busID = DBUtils.getAllRows(self._conn, query)
+        busID = DBUtils.getVar(self._conn, query)
 
         # Update business's num favorites
         query = """UPDATE Business SET numFavouritedDeals = numFavouritedDeals + 1
-                   WHERE businessId = {bid}
+                   WHERE businessId='{bid}'
                 """.format(bid=busID)
         DBUtils.executeUpdate(self._conn, query)
         
     # Businesses -----------------------------------------------------------------------------------
     def getAllRetailers(self):
-        # TODO: Sort by "reputation"
-        query = 'SELECT name, imageURL, homepageURL FROM Business'
+        # Businesses sorted by "reputation", which is num_visits + num_favorites * 2
+        query = """
+        Select name, imageURL, homePageURL, cid as CategoryName
+        FROM Business
+        INNER JOIN (SELECT * from Belongs_To group by cid, bid) belongTo
+        on belongTo.bid=Business.businessId
+        order by (numvisited + numFavouritedDeals*2) desc
+        """
         return DBUtils.getAllRows(self._conn, query)
 
-"""
 
-TOOD: QUERIES
-/*Someone visited a deal*/
-UPDATE Business SET numVisited = numVisited + 1 WHERE businessId = 'b1';
-
-/*Added a deal to favorite list*/
-/* Need the business, dealid, and user id
-UPDATE Business SET numFavouritedDeals = numFavouritedDeals + 1 WHERE businessId = 'b1';
-INSERT into Favorites values ('customerId', 'DealId1');
-
-/*Someone removed deal from their favorite list*/
-UPDATE Business SET numFavouritedDeals = numFavouritedDeals - 1 WHERE businessId = 'b1';
-
-
-
-"""

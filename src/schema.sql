@@ -56,16 +56,16 @@ create table Business (
   numFavouritedDeals Integer
 );
 
-insert into Business values ('b1', 'Pizza Hut', 'https://bit.ly/2IbLOCR', 'https://pizzahut.com', 70000000111, 'R1', '100', '30');
-insert into Business values ('b2', 'Apple', 'https://apple.co/2Ilxbc8', 'https://apple.com', 70000000222, 'R2', '224', '40');
-insert into Business values ('b3', 'Nike', 'http://bit.ly/2KYpEBP', 'https://www.nike.com', 70000000333, 'R3', '330', '50');
-insert into Business values ('b4', 'Ikea', 'http://bit.ly/2jWp8rU', 'https://www.ikea.com', 70000000444, 'R4', '142', '29');
-insert into Business values ('b5', 'Adidas', 'http://bit.ly/2jUJH8d', 'https://www.adidas.com', 70000000555, 'R5', '230', '11');
-insert into Business values ('b6', 'Yamaha', 'http://bit.ly/2rEHFNK', 'https://www.yamaha.com', 70000000666, 'R6', '131', '32');
-insert into Business values ('b7', 'BMW', 'http://bit.ly/2wEa1fN', 'https://www.bmw.com', 70000000777, 'R7', '113', '12');
-insert into Business values ('b8', 'Zara', 'http://bit.ly/2IdyVZi', 'https://www.zara.com', 70000000888, 'R8', '92', '23');
-insert into Business values ('b9', 'Staples', 'http://bit.ly/2KVljzs', 'https://www.staples.com', 70000000999, 'R9', '94', '18');
-insert into Business values ('b10', 'Expedia', 'https://bit.ly/2rFKspU', 'https://www.expedia.com', 70000001010, 'R10', '432', '94');
+insert into Business values ('b1', 'Pizza Hut', 'https://bit.ly/2IbLOCR', 'https://pizzahut.com', 18005555555, 'R1', '100', '30');
+insert into Business values ('b2', 'Apple', 'https://apple.co/2Ilxbc8', 'https://apple.com', 18001231234, 'R2', '224', '40');
+insert into Business values ('b3', 'Nike', 'http://bit.ly/2KYpEBP', 'https://www.nike.com', 18005244254, 'R3', '330', '50');
+insert into Business values ('b4', 'Ikea', 'http://bit.ly/2jWp8rU', 'https://www.ikea.com', 1800545455, 'R4', '142', '29');
+insert into Business values ('b5', 'Adidas', 'http://bit.ly/2jUJH8d', 'https://www.adidas.com', 18001325984, 'R5', '230', '11');
+insert into Business values ('b6', 'Yamaha', 'http://bit.ly/2rEHFNK', 'https://www.yamaha.com', 18008765443, 'R6', '131', '32');
+insert into Business values ('b7', 'BMW', 'http://bit.ly/2wEa1fN', 'https://www.bmw.com', 18009999999, 'R7', '113', '12');
+insert into Business values ('b8', 'Zara', 'http://bit.ly/2IdyVZi', 'https://www.zara.com', 18007778888, 'R8', '92', '23');
+insert into Business values ('b9', 'Staples', 'http://bit.ly/2KVljzs', 'https://www.staples.com', 18001234567, 'R9', '94', '18');
+insert into Business values ('b10', 'Expedia', 'https://bit.ly/2rFKspU', 'https://www.expedia.com', 18009584382, 'R10', '432', '94');
 
 create table Belongs_To (
   bid varchar(128),
@@ -169,14 +169,15 @@ create table Favorites(
   foreign key (did) references Deals(dealId)
 );
 
-insert into Favorites values ('C1', 'DealId1');
-insert into Favorites values ('C1', 'DealId11');
-insert into Favorites values ('C1', 'DealId3');
+
 insert into Favorites values ('C2', 'DealId1');
 insert into Favorites values ('C3', 'DealId7');
+insert into Favorites values ('C4', 'DealId7');
+insert into Favorites values ('C5', 'DealId4');
 insert into Favorites values ('C5', 'DealId3');
 insert into Favorites values ('C3', 'DealId11');
 insert into Favorites values ('C8', 'DealId7');
+insert into Favorites values ('C9', 'DealId4');
 insert into Favorites values ('C9', 'DealId2');
 insert into Favorites values ('C10', 'DealId10');
 

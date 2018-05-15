@@ -115,6 +115,7 @@ deal_text_input = widgets.Text(
     disabled=False,
 )
 
+
 # Homepage favorite button(s)
 def run_favorite_query(sender):
     global profile_view
@@ -124,7 +125,6 @@ def run_favorite_query(sender):
     res = man.openDBConnectionWithBundle("PgBundle.properties")
     man.favoriteDeal(home_deals[deal_index], user)
     profile_view = update_profile() # Update profile page with liked deal
-    print("Deal favorited! See your profile page at any time for deal details.")
 
 # Homepage rate button(s)
 def run_rate_query(sender):
@@ -134,6 +134,7 @@ def run_rate_query(sender):
     man = QueryManager()
     res = man.openDBConnectionWithBundle("PgBundle.properties")
     print(res)
+    # TODO: Query as bottom of page
 
 
 """ Quieries required on load of app """
@@ -215,19 +216,21 @@ def getBusinessResultFromTuple(businesses):
     names = [i[0] for i in businesses]
     imageURLs = [i[1] for i in businesses]
     homepageURLs = [i[2] for i in businesses]
-
+    categories = [i[3] for i in businesses]
     result_page_html = ''
     for i in range(len(names)):
         result_page_html += """
             <div class="grid-container">
                 <div class="grid-item"> <a href="{homepageURL}" target="_blank">{name}</a></div>
                 <div class="grid-item">
-                    <img src="{imageURLs}" height=50 width=50>
+                    <img src="{imageURL}" height=50 width=50>
                 </div>
+                <div class="grid-item">{category}</div>
             </div>
         """.format(homepageURL=homepageURLs[i],
                 name=names[i],
-                imageURLs=imageURLs[i],
+                imageURL=imageURLs[i],
+                category=categories[i]
                 )
     return result_page_html
 
@@ -287,17 +290,7 @@ deals_boxed = run_get_n_deals(6)
 # Vertically arrange welcome banner, search component, and deal grid to create welcome page
 welcome_page = widgets.VBox([welcome_banner, search_component, deals_boxed])
 
-# Get a user's favorited deals
-def run_favorited_deals(user):
-    man = QueryManager()
-    res = man.openDBConnectionWithBundle("PgBundle.properties")
-    favs_list_of_tuples = man.getFavoritedDeals(user)
-    if (len(favs_list_of_tuples) < 1):
-        return widgets.Label(value="No favorited deals")
-    
-    return getDealResultFromTuple(favs_list_of_tuples, False)
-
-# Update user profile
+# Create user profile card
 def create_contact_card(user):
     img = 'https://www.w3schools.com/howto/img_avatar.png'
     if (user.getGender() == 'F'):
@@ -315,12 +308,32 @@ def create_contact_card(user):
         """.format(img=img, first=user.getFName(), last=user.getLName(), age=user.getAge(), email=user.getEmail())
     return widgets.HTML(value=profile_view_html)
 
+
+
+# Get a user's favorited deals
+def run_favorited_deals(user):
+    man = QueryManager()
+    res = man.openDBConnectionWithBundle("PgBundle.properties")
+    favs_list_of_tuples = man.getFavoritedDeals(user)
+    if (len(favs_list_of_tuples) < 1):
+        return widgets.Label(value="No favorited deals")
+    
+    return getDealResultFromTuple(favs_list_of_tuples, False)
+
+    
+profile_top = create_contact_card(user)
+profile_bottom = run_favorited_deals(user)
+profile_view = widgets.VBox([profile_top, profile_bottom])
+
+
+# Return profile page
 def update_profile():
+    global profile_view
+    global pages
     profile_top = create_contact_card(user)
     profile_bottom = run_favorited_deals(user)
-    return widgets.VBox([profile_top, profile_bottom])
-
-profile_view = update_profile()
+    profile_view = widgets.VBox([profile_top, profile_bottom])
+    pages.children = [welcome_page, business_view, profile_view]
 
 # Tab component
 pages = widgets.Tab()
@@ -403,6 +416,7 @@ def run_rate_query_result_page(sender):
         return
     d = search_deals[chosen_deal_int] # Deal object
     print("You chose to rate DID = " + d.getDid())
+    # TODO: Query
 
 """ Button handlers ----------------------------------------------"""
 search_button.on_click(run_deal_search_query)
