@@ -22,6 +22,7 @@ def get_first_user():
                 password=user_tuple[8])
     return c
 user = get_first_user()
+search_view_slider = None
 if user is None:
     print("Error running app. No user found. Quitting")
     sys.exit()
@@ -34,6 +35,7 @@ def getDealResultFromTuple(deals, rating_enabled=True):
     global num_search_results
     global result_deals_dict
     global search_deals
+    global search_view_slider
     search_deals = []
     result_deals_dict = {} # reset dict on each search
     man = QueryManager()
@@ -96,7 +98,7 @@ def getDealResultFromTuple(deals, rating_enabled=True):
             readout=True,
             readout_format='d'
             )
-
+    search_view_slider = slider # Save for later rating
     rate_button_general = widgets.Button(description="Rate")
     rate_button_general.on_click(run_rate_query_result_page)
     rating_box = widgets.HBox([slider, deal_text_input,rate_button_general])
@@ -134,15 +136,14 @@ def run_favorite_query(sender):
     profile_view = update_profile() # Update profile page with liked deal
 
 # Homepage rate button(s)
-# TODO: Rate typer at bottom of page, i.e. TODO: add and pass in the deal to this function.
-def run_rate_query(sender):
+def run_rate_query_home(sender):
     global profile_view
     deal_index = rating_button_dict[sender] #lookup in dict for which button was clicked
     deal_ID = home_deals[deal_index].getDid()
     man = QueryManager()
     res = man.openDBConnectionWithBundle("PgBundle.properties")
     man.rateDeal(home_deals[deal_index], user, rating_sliders[deal_index].value)
-    profile_view = update_profile() # Update profile page with rated deal
+    profile_view = update_profile() # Update profile page with rated deal (seen when deal is favorited)
 
 """ Quieries required on load of app """
 # Create homepage data from top 6 deals
@@ -192,7 +193,7 @@ def run_get_n_deals(n):
     for i in range(n):
         rating_button_dict[deal_button_controls[i].children[0]] = i
         favorite_button_dict[deal_button_controls[i].children[1]] = i
-        deal_button_controls[i].children[0].on_click(run_rate_query)
+        deal_button_controls[i].children[0].on_click(run_rate_query_home)
         deal_button_controls[i].children[1].on_click(run_favorite_query)
 
     deal_detail_cols = [widgets.VBox([deal_descriptions[i], rating_sliders[i],
@@ -325,7 +326,6 @@ def run_favorited_deals(user):
         return widgets.Label(value="No favorited deals")
     
     return getDealResultFromTuple(favs_list_of_tuples, False)
-
     
 profile_top = create_contact_card(user)
 profile_bottom = run_favorited_deals(user)
@@ -420,9 +420,30 @@ def run_rate_query_result_page(sender):
     if (chosen_deal_int >= num_search_results or chosen_deal_int < 0):
         print("""Input not in bounds. Please enter a deal number between {low} and {high}""".format(low=0,high=num_search_results - 1))
         return
+    man = QueryManager()
+    res = man.openDBConnectionWithBundle("PgBundle.properties")
     d = search_deals[chosen_deal_int] # Deal object
-    print("You chose to rate DID = " + d.getDid())
-    # TODO: Query
+    man.rateDeal(d, user, search_view_slider.value) 
+    
+    # Refresh results
+    man = QueryManager()
+    res = man.openDBConnectionWithBundle("PgBundle.properties")
+    deals = man.getAllDeals()
+    if (len(deals) < 1): # Shouldn't ever happen unless an eror occurs
+        print("Error connecting to database. Try again soon.")
+        return 
+
+    result_page = getDealResultFromTuple(deals)
+    # Last tab should be search results and replaced if it already is
+    l = list(pages.children)
+    if len(pages.children) < 4:
+        l.append(result_page)
+    else:
+        l[len(pages.children) - 1] = result_page # Overrite search result page
+    
+    pages.children = tuple(l)
+    # Switch to search result page
+    pages.selected_index = len(pages.children) - 1
 
 """ Button handlers ----------------------------------------------"""
 search_button.on_click(run_deal_search_query)
