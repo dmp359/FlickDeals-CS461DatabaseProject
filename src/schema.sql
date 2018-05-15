@@ -109,7 +109,7 @@ insert into Deals values ('DealId2', '01-19-18', 'Buy 3 iphones get 1 free', 'Bu
 insert into Deals values ('DealId3', '01-19-18', 'Discount on golf kit', '$100 off your first order of nike Golf kit', 1.5, 
                           'http://bit.ly/2IBnV7s',
                           '01-29-18', '02-10-18', 'b3');
-insert into Deals values ('DealId4', '01-19-18', '$60 off', '$60 off on more than 600 of shopping', 4.0, 
+insert into Deals values ('DealId4', '01-19-18', '$60 off', '40% off when you do more than $500 dollars worth of shopping', 4.0, 
                           'http://bit.ly/2jSaHVC',
                           '02-11-18', '02-18-18', 'b4');
 insert into Deals values ('DealId5', '01-19-18', 'Free Sneakers', 'Only valid in limited stores', 4.0, 
