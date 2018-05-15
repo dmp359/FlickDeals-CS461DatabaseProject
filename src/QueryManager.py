@@ -91,51 +91,43 @@ class QueryManager:
         return DBUtils.getAllRows(self._conn, query)
 
     def getTopNDeals(self, n):
+        # Return the top n best deals (best as in highest average rating)
         query = """
             SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
                    Deals.startDate, Deals.endDate, Business.name, Business.phoneNum,
                    Business.businessId, Deals.dealId
             FROM Deals
             INNER JOIN Business ON Deals.bid=Business.businessId
+            WHERE Deals.avgRating IS NOT NULL
             ORDER BY Deals.avgRating desc
             LIMIT {n}
         """.format(n=n)
         return DBUtils.getAllRows(self._conn, query)
 
     def searchForDeal(self, deal_name):
-        # TODO: Maybe also UNION with 'FROM Deals where description matches deal name
-        query = """SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
-                   Deals.startDate, Deals.endDate, Business.name, Business.phoneNum, Business.businessId, Deals.dealId
-                    FROM Deals
-                    INNER JOIN Business ON Deals.bid=Business.businessId
-                    where title LIKE \'%{deal_name}%\'
-                    ORDER BY Deals.avgrating DESC;
+        # Get deal info where name or description contains a substring of the passed
+        # in deal_name search string
+        query = """
+                   SELECT Deals.title, Deals.description, Deals.avgRating, Deals.imageURL,
+                       Deals.startDate, Deals.endDate, Business.name,
+                       Business.phoneNum, Business.businessId, Deals.dealId
+                   FROM Deals
+                   INNER JOIN Business ON Deals.bid=Business.businessId
+                   where title LIKE \'%{deal_name}%\' or description LIKE \'%{deal_name}%\'
+                   ORDER BY Deals.avgrating DESC
                     """.format(deal_name=deal_name)
         return DBUtils.getAllRows(self._conn, query)
 
 
-    
-    def favoriteDeal(self, business, deal, customer):
-        try :
-            query=""" This is just (step 3)
-            UPDATE Business SET numFavouritedDeals = numFavouritedDeals + 1 WHERE businessId = '%s'
-            """
-            DBUtils.executeUpdate(self._conn, query, business.getBid())
-            business.setNumFavorites(1 + business.getNumFavorites())
-        except psycopg2.Error as e:
-                print (e)
-
-        return business # Return both deal and business like: [deal, business] so I can update UI
-
     def favoriteDeal(self, deal, customer):
-        # Check if the customer has already favorited this deal (select in Favorites).
+        # Check if the customer has already favorited this deal (select from Favorites).
         query = """SELECT count(*) FROM Favorites 
                 WHERE cid='{cid}' and did='{did}'""".format(cid=customer.getCid(), did=deal.getDid())
         result = DBUtils.getVar(self._conn, query)
 
-        # If so, return. You can only favorite once
+        # If so, return. You can only favorite once per deal
         if (result > 0):
-            print("Deal already exists in favorites")
+            print("{name} has already favorited this deal".format(name=customer.getFName()))
             return
 
         # Add favorite to favorite table, (linking customer and the deal)
@@ -154,7 +146,68 @@ class QueryManager:
                 """.format(bid=busID)
         DBUtils.executeUpdate(self._conn, query)
         print("Deal favorited! Check your profile.")
-        return False # did not exist until now
+        
+        
+    def getUserRating(self, deal, customer):
+        # Find what a user rated a value, i.e. you rated this deal x out of 5
+        # First check if the value exists
+        query = """
+            SELECT COUNT(*) FROM Ratings
+            WHERE cid='{cid}' and did='{did}'
+            """.format(cid=customer.getCid(), did=deal.getDid())
+        result = DBUtils.getVar(self._conn, query)
+        if result < 1:
+            return None
+        
+        query = """
+            SELECT value FROM Ratings
+            WHERE cid='{cid}' and did='{did}'
+            """.format(cid=customer.getCid(), did=deal.getDid())
+        result = DBUtils.getVar(self._conn, query)
+        return result
+        
+
+    def rateDeal(self, deal, customer, value):
+        # Check if the customer has already rated this deal (select from Ratings)
+        query = """SELECT count(*) FROM Ratings 
+                WHERE cid='{cid}' and did='{did}'
+                """.format(cid=customer.getCid(), did=deal.getDid())
+        result = DBUtils.getVar(self._conn, query)
+        # If so, the rating should be updated
+        if result > 0:
+            print("You have already rated this deal")
+            return
+            
+        else: # Rating is new and has to be added
+            query = """INSERT INTO Ratings VALUES (%s, %s, %s)"""
+            DBUtils.executeUpdate(self._conn, query, (customer.getCid(), deal.getDid(), value))
+        
+        # Update deal's average rating
+        # 1) Count the number of ratings this now deal has
+        query = """SELECT count(*) FROM Ratings 
+                WHERE did='{did}'""".format(did=deal.getDid())
+        num_ratings = DBUtils.getVar(self._conn, query) # (Is at least one here)
+
+        # 2) Get previous average rating
+        query = """SELECT avgRating FROM Deals 
+                WHERE dealId='{did}'""".format(did=deal.getDid())
+        previous_avg = DBUtils.getVar(self._conn, query)
+
+        if previous_avg is not None:
+            # 3a) Calculate updated average.
+            new_avg = (previous_avg + value) / num_ratings
+        else:
+            # 3b) Calculate new average.
+            new_avg = value
+
+        # 4) Update deal's average rating     
+        query = """UPDATE Deals SET avgRating = {new_avg}
+                   WHERE dealId='{did}'
+                """.format(did=deal.getDid(), new_avg=new_avg)
+
+        DBUtils.executeUpdate(self._conn, query)
+        print("Deal rated!")
+
         
     # Businesses -----------------------------------------------------------------------------------
     def getAllRetailers(self):

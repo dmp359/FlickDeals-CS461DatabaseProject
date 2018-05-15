@@ -7,6 +7,25 @@ from QueryManager import QueryManager
 from Deal import Deal
 from Business import Business
 
+# i.e. pretend account creation occured and a user was created with these credentials (first customer in our db):
+def get_first_user():
+    man = QueryManager()
+    res = man.openDBConnectionWithBundle("PgBundle.properties")
+    user_tuple = man.getFirstUser()[0] # (First item of list of 1 element is the tuple)
+    if (len(user_tuple) < 1):
+        print("Error connecting to db. No users found. Try again later")
+        return None
+    # Create customer object
+    c = Customer(cid=user_tuple[0], age=user_tuple[1], 
+                fname=user_tuple[2], lname=user_tuple[3], gender=user_tuple[4],
+                aid=user_tuple[5], pnum = user_tuple[6], email= user_tuple[7],
+                password=user_tuple[8])
+    return c
+user = get_first_user()
+if user is None:
+    print("Error running app. No user found. Quitting")
+    sys.exit()
+
 # Given a list of deals tuples, convert the data into html results page
 # Used to avoid a lot of duplicate code between search and browse all
 # @param deals - a deals tuple response from a query
@@ -17,18 +36,27 @@ def getDealResultFromTuple(deals, rating_enabled=True):
     global search_deals
     search_deals = []
     result_deals_dict = {} # reset dict on each search
-   
+    man = QueryManager()
+    res = man.openDBConnectionWithBundle("PgBundle.properties")
     result_page_html = ''
     num_search_results = len(deals)
     container = 'grid-container'
-    if not rating_enabled:
+
+    if not rating_enabled: # i.e., profile page
         container = 'grid-container-compact'
-    for i in range(num_search_results):
+    for i in range(num_search_results): # Note: NULL values in the db are here as 'None'
         d = Deal(title=deals[i][0], desc=deals[i][1], avg_rating=deals[i][2], 
                  img=deals[i][3], start_date=deals[i][4],
                  end_date=deals[i][5], b_name = deals[i][6], b_num= deals[i][7],
                  bid=deals[i][8], did=deals[i][9])
         search_deals.append(d)
+        you_rated = man.getUserRating(d, user) # Lookup what the user has rated this deal. If it exists, print it as well
+        rate_prefix = '<div class="grid-item">'
+        ratingInfo = rate_prefix + 'This deal is not yet rated</div>'
+        if d.getAvgRating() is not None:
+            ratingInfo = rate_prefix + 'Avg rating = {rating}/5.0</div>'.format(rating=str(round(search_deals[i].getAvgRating(), 2)))
+        if you_rated is not None: # Note, if a user rated a deal avg_rating of the deal is not null
+            ratingInfo = rate_prefix + 'Avg rating is {rating}/5.0. You rated it {user_rating}/5.0</div>'.format(rating=search_deals[i].getAvgRating(), user_rating=str(round(you_rated, 2)))
         result_page_html += """
             <div class="{container}">
                 <div class="grid-item">{i}</div>
@@ -37,7 +65,7 @@ def getDealResultFromTuple(deals, rating_enabled=True):
                 <div class="grid-item">
                     <img src="{imgUrl}" height=100 width=100>
                 </div>
-                <div class="grid-item">Rating = {rating}/5.0</div>
+                {rating}
                 <div class="grid-item">Valid from {startDate} to {endDate}</div>
                 <div class="grid-item">Contact {businessName} at {businessNum}</div>
             </div>
@@ -45,7 +73,7 @@ def getDealResultFromTuple(deals, rating_enabled=True):
         """.format(container=container,i=i,
                    title=search_deals[i].getTitle(),
                    description=search_deals[i].getDescription(),
-                   rating=search_deals[i].getAvgRating(),
+                   rating=ratingInfo,
                    imgUrl=search_deals[i].getImage(),
                    startDate=search_deals[i].getStartDate(),
                    endDate=search_deals[i].getEndDate(),
@@ -77,26 +105,6 @@ def getDealResultFromTuple(deals, rating_enabled=True):
     return result_page
 
 
-
-# i.e. pretend account creation occured and a user was created with these credentials (first customer in our db):
-def get_first_user():
-    man = QueryManager()
-    res = man.openDBConnectionWithBundle("PgBundle.properties")
-    user_tuple = man.getFirstUser()[0] # (First item of list of 1 element is the tuple)
-    if (len(user_tuple) < 1):
-        print("Error connecting to db. No users found. Try again later")
-        return None
-    # Create customer object
-    c = Customer(cid=user_tuple[0], age=user_tuple[1], 
-                fname=user_tuple[2], lname=user_tuple[3], gender=user_tuple[4],
-                aid=user_tuple[5], pnum = user_tuple[6], email= user_tuple[7],
-                password=user_tuple[8])
-    return c
-user = get_first_user()
-if user is None:
-    print("Error running app. No user found. Quitting")
-    sys.exit()
-
 num_search_results = 0
 
 rating_sliders = []
@@ -126,15 +134,15 @@ def run_favorite_query(sender):
     profile_view = update_profile() # Update profile page with liked deal
 
 # Homepage rate button(s)
+# TODO: Rate typer at bottom of page, i.e. TODO: add and pass in the deal to this function.
 def run_rate_query(sender):
+    global profile_view
     deal_index = rating_button_dict[sender] #lookup in dict for which button was clicked
-    deal_ID = home_deals[deal_index].getDid() #lookup in dict for which ID corresponds
-    print('You chose to rate deal ID: ' + deal_ID + ' with a value of ' + str(rating_sliders[deal_index].value))
+    deal_ID = home_deals[deal_index].getDid()
     man = QueryManager()
     res = man.openDBConnectionWithBundle("PgBundle.properties")
-    print(res)
-    # TODO: Query as bottom of page
-
+    man.rateDeal(home_deals[deal_index], user, rating_sliders[deal_index].value)
+    profile_view = update_profile() # Update profile page with rated deal
 
 """ Quieries required on load of app """
 # Create homepage data from top 6 deals
@@ -308,7 +316,6 @@ def create_contact_card(user):
     return widgets.HTML(value=profile_view_html)
 
 
-
 # Get a user's favorited deals
 def run_favorited_deals(user):
     man = QueryManager()
@@ -393,7 +400,7 @@ def run_deal_search_query(sender):
 
     # Last tab should be search results and replaced if it already is
     l = list(pages.children)
-    if len(pages.children) < 3:
+    if len(pages.children) < 4:
         l.append(result_page)
     else:
         l[len(pages.children) - 1] = result_page
@@ -401,7 +408,7 @@ def run_deal_search_query(sender):
     pages.children = tuple(l)
 
     # Switch to search result page
-    pages.selected_index = 2
+    pages.selected_index = len(pages.children) - 1
 
 # Results page rate button
 def run_rate_query_result_page(sender):
