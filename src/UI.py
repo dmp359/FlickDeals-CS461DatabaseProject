@@ -116,7 +116,7 @@ rating_button_dict = {}
 favorite_button_dict = {}
 home_deals = [] # List of deal objects
 search_deals = [] # List of search result deal objects
-
+current_filter_string = ''
 # Deal choose text on search result page
 deal_text_input = widgets.Text(
     value='',
@@ -360,6 +360,8 @@ def launch():
 
 """ Click functions ----------------------------------------------"""
 def run_deal_all_query(sender):
+    global current_filter_string
+    current_filter_string = ''
     man = QueryManager()
     res = man.openDBConnectionWithBundle("PgBundle.properties")
     deals = man.getAllDeals()
@@ -380,6 +382,7 @@ def run_deal_all_query(sender):
     pages.selected_index = len(pages.children) - 1
 
 def run_deal_search_query(sender):
+    global current_filter_string
     if (search_bar.value == ''):
         return
     man = QueryManager()
@@ -387,7 +390,8 @@ def run_deal_search_query(sender):
 
     # Deals is a list of tuples in the form of
     # (title, description, avgRating, imageURL, startDate, endDate)
-    deals = man.searchForDeal(search_bar.value)
+    current_filter_string = search_bar.value
+    deals = man.searchForDeal(current_filter_string)
     # Result page of search. Create html grid for each deal
     result_page_html = ''
     if (len(deals) < 1): # If nothing matches search
@@ -428,22 +432,30 @@ def run_rate_query_result_page(sender):
     # Refresh results
     man = QueryManager()
     res = man.openDBConnectionWithBundle("PgBundle.properties")
-    deals = man.getAllDeals()
-    if (len(deals) < 1): # Shouldn't ever happen unless an eror occurs
-        print("Error connecting to database. Try again soon.")
-        return 
+    deals = ''
+    if current_filter_string:
+        deals = man.searchForDeal(current_filter_string)
+    else:
+        deals = man.getAllDeals()
+    
+    # Result page of search. Create html grid for each deal
+    result_page_html = ''
+    if (len(deals) < 1): # If nothing matches search
+        result_page_html = """
+            <div class="grid-item">No deals found containing "{val}" in the title</div>
+        """.format(val=search_bar.value)
+        result_page = widgets.HTML(value=result_page_html)
+    else:
+        result_page = getDealResultFromTuple(deals)
 
-    result_page = getDealResultFromTuple(deals)
     # Last tab should be search results and replaced if it already is
     l = list(pages.children)
     if len(pages.children) < 4:
         l.append(result_page)
     else:
-        l[len(pages.children) - 1] = result_page # Overrite search result page
+        l[len(pages.children) - 1] = result_page
     
     pages.children = tuple(l)
-    # Switch to search result page
-    pages.selected_index = len(pages.children) - 1
 
 """ Button handlers ----------------------------------------------"""
 search_button.on_click(run_deal_search_query)
