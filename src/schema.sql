@@ -93,6 +93,7 @@ create table Deals (
   description varchar(128),
   avgRating float,
   imageURL varchar(128),
+  durId varchar(128) unique,
   startDate Date not null,
   endDate Date not null,
   bid varchar(128),
@@ -100,65 +101,65 @@ create table Deals (
   foreign key (bid) references Business(businessId) on delete cascade
 );
 
-insert into Deals values ('DealId1', '01-19-18', 'Pizza Hut : Discount', '$10 off your first order at PizzaHut.com!', 2.5, 
-                          'https://www.bleepstatic.com/content/posts/2017/10/15/PizzaHut.jpg',
+insert into Deals values ('DealId1', '01-19-18', 'Pizza Hut : Discount', '$10 off your first order at PizzaHut.com!', 4.5, 
+                          'https://www.bleepstatic.com/content/posts/2017/10/15/PizzaHut.jpg', 'DUR1',
                           '01-20-18', '01-25-18', 'b1');
-insert into Deals values ('DealId2', '01-19-18', 'Buy 3 iphones get 1 free', 'Buy 3 iPhones get 1 free!', 1.0, 
-                          'https://vz.to/2wEXqJq',
+insert into Deals values ('DealId2', '01-19-18', 'Buy 3 iphones get 1 free', 'Buy 3 iPhones get 1 free!', 3.2, 
+                          'https://vz.to/2wEXqJq', 'DUR2',
                           '01-26-18', '01-28-18', 'b2');
-insert into Deals values ('DealId3', '01-19-18', 'Discount on golf kit', '$100 off your first order of nike Golf kit', 1.5, 
-                          'http://bit.ly/2IBnV7s',
+insert into Deals values ('DealId3', '01-19-18', 'Discount on golf kit', '$100 off your first order of nike Golf kit', 4.5, 
+                          'http://bit.ly/2IBnV7s', 'DUR3',
                           '01-29-18', '02-10-18', 'b3');
-insert into Deals values ('DealId4', '01-19-18', '$60 off', '40% off when you do more than $500 dollars worth of shopping', 4.0, 
-                          'http://bit.ly/2jSaHVC',
+insert into Deals values ('DealId4', '01-19-18', '$60 off', '$60 off on more than $600 of shopping', 4.2, 
+                          'http://bit.ly/2jSaHVC', 'DUR4',
                           '02-11-18', '02-18-18', 'b4');
-insert into Deals values ('DealId5', '01-19-18', 'Free Sneakers', 'Only valid in limited stores', 4.0, 
-                          'http://bit.ly/2IwuLer',
+insert into Deals values ('DealId5', '01-19-18', 'Free Sneakers', 'Only valid in limited stores', 1.5, 
+                          'http://bit.ly/2IwuLer', 'DUR5',
                           '02-19-18', '02-24-18', 'b5');
-insert into Deals values ('DealId6', '01-19-18', 'Discount on boats', '$1000 off your first SMX32xv boat', 3.0, 
-                          'http://bit.ly/2IavX7E',
+insert into Deals values ('DealId6', '01-19-18', 'Discount on boats', '$1000 off your first SMX32xv boat', 4.5, 
+                          'http://bit.ly/2IavX7E', 'DUR6',
                           '02-24-18', '02-28-18', 'b6');
-insert into Deals values ('DealId7', '01-19-18', 'Free Insurance', '$850 worth of free insurance ', 5.0, 
-                          'http://bit.ly/2rDYg4d',
+insert into Deals values ('DealId7', '01-19-18', 'Free Insurance', '$850 worth of free insurance ', 4.0, 
+                          'http://bit.ly/2rDYg4d', 'DUR7',
                           '02-24-18', '02-28-18', 'b7');
-insert into Deals values ('DealId8', '01-19-18', 'Buy 1 get 1 50% off', 'Offer valid on limited items', NULL, 
-                          'http://bit.ly/2KWPgz6',
+insert into Deals values ('DealId8', '01-19-18', 'Buy 1 get 1 50% off', 'Offer valid on limited items', 2.5, 
+                          'http://bit.ly/2KWPgz6', 'DUR8',
                           '02-24-18', '02-28-18', 'b8');
-insert into Deals values ('DealId9', '01-19-18', '40% off trip to Paris', 'Offer valid during month of January and February', NULL, 
-                          'http://bit.ly/2IhQzH9',
+insert into Deals values ('DealId9', '01-19-18', '40% off trip to Paris', 'Offer valid during month of January and February', 3.5, 
+                          'http://bit.ly/2IhQzH9', 'DUR9',
                           '01-01-18', '02-28-18', 'b10');
-insert into Deals values ('DealId10', '01-19-18', 'Laser Printer', 'Laser Printer just for $90', NULL, 
-                          'http://bit.ly/2jSfWVi',
+insert into Deals values ('DealId10', '01-19-18', 'Laser Printer', 'Laser Printer just for $90', 3.5, 
+                          'http://bit.ly/2jSfWVi', 'DUR10',
                           '01-01-18', '02-28-18', 'b9');
-insert into Deals values ('DealId11', '01-19-18', 'Special Deals', '3 Medium Pizza for $20', 3.5, 
-                          'https://read.bi/2KXUlHv',
+insert into Deals values ('DealId11', '01-19-18', 'Special Deals', '3 Medium Pizza for $20', 4.5, 
+                          'https://read.bi/2KXUlHv', 'DUR11',
                           '01-20-18', '01-25-18', 'b1');
-insert into Deals values ('DealId12', '01-19-18', 'Free Cookies', 'Get free cookies on order of $30 or more', NULL, 
-                          'http://bit.ly/2GaOCdV',
+insert into Deals values ('DealId12', '01-19-18', 'Free Cookies', 'Get free cookies on order of $30 or more', 2.5, 
+                          'http://bit.ly/2GaOCdV', 'DUR12',
                           '01-20-18', '01-25-18', 'b1');
-insert into Deals values ('DealId13', '01-19-18', 'Back to school', 'School supplies starting at $0.30. Minimum 20 dollar purchase required', NULL, 
-                          'http://bit.ly/2KjKPx9',
+insert into Deals values ('DealId13', '01-19-18', 'Back to school', 'School supplies starting at $0.30. Minimum $20 purchase required', 3.0, 
+                          'http://bit.ly/2KjKPx9', 'DUR13',
                           '01-01-18', '02-28-18', 'b9');
-insert into Deals values ('DealId14', '01-19-18', 'Apple Watch', 'Apple Watch for $100', NULL, 
-                          'http://bit.ly/2KY5ckL',
+insert into Deals values ('DealId14', '01-19-18', 'iWatch', 'iWatch for $100', 4.5, 
+                          'http://bit.ly/2KY5ckL', 'DUR14',
                           '01-01-18', '02-28-18', 'b2');
-insert into Deals values ('DealId15', '01-19-18', 'Air Jordan', 'Air Jordan for $150', NULL, 
-                          'http://bit.ly/2IzTXjZ',
+insert into Deals values ('DealId15', '01-19-18', 'Air Jordan', 'Air Jordan for $150', 5.0, 
+                          'http://bit.ly/2IzTXjZ', 'DUR15',
                           '01-01-18', '02-28-18', 'b3');
-insert into Deals values ('DealId16', '01-19-18', 'Round trip to Uk for $200', 'Offer valid during month of January and February', 3.0, 
-                          'http://bit.ly/2wETmsw',
+insert into Deals values ('DealId16', '01-19-18', 'Round trip to Uk for $200', 'Offer valid during month of January and February', 5.0, 
+                          'http://bit.ly/2wETmsw', 'DUR16',
                           '01-01-18', '02-28-18', 'b10');
-insert into Deals values ('DealId17', '01-19-18', 'Round trip to India $250', 'Offer valid during month of January and February', NULL, 
-                          'http://bit.ly/2IhLVgA',
+insert into Deals values ('DealId17', '01-19-18', 'Round trip to India $250', 'Offer valid during month of January and February', 5.0, 
+                          'http://bit.ly/2IhLVgA', 'DUR17',
                           '01-01-18', '02-28-18', 'b10');
-insert into Deals values ('DealId18', '01-19-18', '$15 off', 'Minimum $100 purchase required', 3.0, 
-                          'http://bit.ly/2KYwzLj',
+insert into Deals values ('DealId18', '01-19-18', '$15 off', 'Minimum $100 purchase required', 2.5, 
+                          'http://bit.ly/2KYwzLj', 'DUR18',
                           '02-24-18', '02-28-18', 'b8');
-insert into Deals values ('DealId19', '01-19-18', 'Discount on shoes', 'Offer valid on limited stores. Till stock lasts', NULL, 
-                          'http://bit.ly/2IaBVFA',
+insert into Deals values ('DealId19', '01-19-18', 'Discount on shoes', 'Offer valid on limited stores. Till stock lasts', 2.5, 
+                          'http://bit.ly/2IaBVFA', 'DUR19',
                           '02-24-18', '02-28-18', 'b8');
-insert into Deals values ('DealId20', '01-19-18', '20% off on BMWX3', NULL, NULL, 
-                          'http://bit.ly/2KkE7XP',
+insert into Deals values ('DealId20', '01-19-18', '20% off on BMWX3', null, 4.0, 
+                          'http://bit.ly/2KkE7XP', 'DUR20',
                           '02-24-18', '02-28-18', 'b7');
 
 create table Favorites(
@@ -184,19 +185,20 @@ insert into Favorites values ('C10', 'DealId10');
 create table Ratings(
   cid varchar(128),
   did varchar(128),
+  ratingId varchar(128) primary key,
   value integer,
-  primary key (cid, did),
+  unique (cid, did),
   foreign key (cid) references Customers(customerId),
   foreign key (did) references Deals(dealId)
 );
 
-insert into Ratings values ('C2', 'DealId1', 4);
-insert into Ratings values ('C2', 'DealId11', 2);
-insert into Ratings values ('C3', 'DealId3', 2);
-insert into Ratings values ('C4', 'DealId1', 1);
-insert into Ratings values ('C5', 'DealId4', 4);
-insert into Ratings values ('C6', 'DealId5', 4);
-insert into Ratings values ('C2', 'DealId7', 5);
-insert into Ratings values ('C6', 'DealId2', 1);
-insert into Ratings values ('C7', 'DealId6', 3);
-insert into Ratings values ('C8', 'DealId3', 1);
+insert into Ratings values ('C1', 'DealId1', 'R1', 4);
+insert into Ratings values ('C2', 'DealId11', 'R2', 2.3);
+insert into Ratings values ('C3', 'DealId3', 'R3', 2);
+insert into Ratings values ('C4', 'DealId1', 'R4', 1);
+insert into Ratings values ('C5', 'DealId4', 'R5', 4);
+insert into Ratings values ('C1', 'DealId5', 'R6', 3.5);
+insert into Ratings values ('C2', 'DealId7', 'R7', 2.3);
+insert into Ratings values ('C6', 'DealId2', 'R8', 1.4);
+insert into Ratings values ('C7', 'DealId6', 'R9', 3.5);
+insert into Ratings values ('C8', 'DealId3', 'R10', 5);
